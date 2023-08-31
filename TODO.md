@@ -1,9 +1,11 @@
 - Add feature that shows a line/bar graph inspired by Strava to show points over time
 - Add "Submit Score" button
 - Add "Add Habit" button, includes number of available achievable points
-- Fix Date Bug
 - Add "Rotating Background" feature which changes the background image daily
 - Add Startup features:
     - Request first name --> "____'s Habit Tracker"
     - Tutorial
 - "Reset Week" Button (just has reset icon), prompt a popup
+
+DONE:
+- Fix Date Bug

@@ -45,19 +45,23 @@ const App = () => {
     return score;
   };
 
-  const getCurrentDate = (dayOffset) => {
+  const getCurrentWeekDates = () => {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + dayOffset);
-    return currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
+    const currentDay = currentDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+  
+    // Calculate the number of days to subtract to get to the start of the week (Monday)
+    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
+  
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(currentDate);
+      date.setDate(currentDate.getDate() - daysUntilMonday + i);
+      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
+    }
+  
+    return weekDates;
   };
   
-  const getMondayDate = () => {
-    const currentDate = new Date();
-    const currentDay = currentDate.getDay();
-    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-    currentDate.setDate(currentDate.getDate() - daysUntilMonday);
-    return currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' });
-  };
 
   return (
     <div className="App">     
@@ -69,9 +73,8 @@ const App = () => {
           <thead>
             <tr>
               <th></th>
-              <th>{getMondayDate()}</th>
-              {[...Array(6)].map((_, dayIndex) => (
-                <th key={dayIndex}>{getCurrentDate(dayIndex - 1)}</th>
+              {getCurrentWeekDates().map((date, dayIndex) => (
+                <th key={dayIndex}>{date}</th>
               ))}
             </tr>
           </thead>
