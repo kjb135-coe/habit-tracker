@@ -39,7 +39,7 @@ const App = () => {
     let score = 0;
     gridData.forEach((habit) => {
       habit.days.forEach((value) => {
-        score += value;
+        if(value != -1) score += value;
       });
     });
     return score;
@@ -94,7 +94,7 @@ const App = () => {
             ))}
             <tr>
               <td>Score</td>
-              <td colSpan="7" bgcolor="#FFFF00">
+              <td colSpan="7">
                 <b>{calculateScore()} </b>
                 </td>
             </tr>
