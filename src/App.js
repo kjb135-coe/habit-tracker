@@ -13,6 +13,9 @@ const App = () => {
     { habit: 'ST <3.5 Hours', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
+  const [newHabitName, setNewHabitName] = useState('');
+  const [selectedWCount, setSelectedWCount] = useState('Enter Possible W\'s');  
+
   // Click event handler for each cell
   const handleCellClick = (habitIndex, dayIndex) => {
     const newGridData = [...gridData];
@@ -61,10 +64,31 @@ const App = () => {
   
     return weekDates;
   };
+
+  
+  const addNewHabit = () => {
+    if (!newHabitName || selectedWCount === 'Enter Possible W\'s') {
+      alert('Please enter a habit name and select the number of W\'s.');
+      return;
+    }
+  
+    const newHabit = {
+      habit: newHabitName,
+      days: Array(7).fill(0),
+    };
+  
+    for (let i = 0; i < parseInt(selectedWCount); i++) {
+      newHabit.days[i] = 1;
+    }
+  
+    setGridData([...gridData, newHabit]);
+    setNewHabitName('');
+    setSelectedWCount('Enter Possible W\'s');
+  };
   
 
   return (
-    <div className="App">     
+    <div className="App">
       <div className="GridContainer">
         <header className="App-header">
           <h1 className="App-title">Habit Tracker</h1>
@@ -83,7 +107,7 @@ const App = () => {
               <tr key={habitIndex}>
                 <td>{habit.habit}</td>
                 {habit.days.map((value, dayIndex) => (
-                  <td 
+                  <td
                     key={dayIndex}
                     className={
                       value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'
@@ -99,10 +123,30 @@ const App = () => {
               <td>Score</td>
               <td colSpan="7">
                 <b>{calculateScore()} </b>
-                </td>
+              </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div className="AddHabit">
+        <input
+          type="text"
+          placeholder="New Habit Name"
+          value={newHabitName}
+          onChange={(e) => setNewHabitName(e.target.value)}
+        />
+        <select
+          value={selectedWCount}
+          onChange={(e) => setSelectedWCount(e.target.value)}
+        >
+          <option disabled>Enter Possible W's</option>
+          <option value="1">1 W</option>
+          <option value="2">2 W's</option>
+          <option value="3">3 W's</option>
+          <option value="4">4 W's</option>
+          <option value="5">5 W's</option>
+        </select>
+        <button onClick={addNewHabit}>Add Habit +</button>
       </div>
     </div>
   );

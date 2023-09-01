@@ -6,6 +6,7 @@
     - Request first name --> "____'s Habit Tracker"
     - Tutorial
 - "Reset Week" Button (just has reset icon), prompt a popup
+- Add "Edit" button which users are able to delete habits (just the edit icon)
 
 DONE:
 - Fix Date Bug

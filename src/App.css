@@ -9,9 +9,13 @@ body {
 
 .App {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-family: 'Roboto', sans-serif;
-  color: #ffffff; 
+  color: #ffffff;
+  min-height: 100vh;
 }
 
 .App-header {
@@ -31,7 +35,7 @@ body {
 
 .GridContainer {
   flex: 3;
-  width: 75%; /* Set width to 75% */
+  width: 100%; /* Set width to 75% */
   overflow-x: auto;
 }
 
@@ -91,4 +95,46 @@ td.green, td.red, td.middle {
 
 td.green:hover, td.red:hover, td.middle:hover {
   opacity: 0.8;
+}
+
+.AddHabit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+
+.AddHabit input[type="text"],
+.AddHabit select {
+  margin-right: 10px;
+  padding: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  opacity: 0.5;
+}
+
+.AddHabit button {
+  padding: 5px 10px;
+  font-size: 16px;
+  background-color: #105be7;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.AddHabit button:hover {
+  background-color: #0a3da5;
+  opacity: 1.0;
+}
+
+.AddHabit select:hover {
+  opacity: 1.0;
+}
+
+.AddHabit input:hover {
+  opacity: 1.0;
 }
