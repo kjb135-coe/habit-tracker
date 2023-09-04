@@ -15,6 +15,9 @@ const App = () => {
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
   const [selectedWCount, setSelectedWCount] = useState(1);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
+
 
   // Click event handler for each cell
   const handleCellClick = (habitIndex, dayIndex) => {
@@ -87,7 +90,9 @@ const App = () => {
   };
 
   const handleAddHabitClick = () => {
-    setShowAddHabit(true);
+    setIsDropdownVisible(!isDropdownVisible);
+    if(isDropdownVisible) setShowAddHabit(true);
+    else setShowAddHabit(false);
   };
 
   const handleAddNewHabit = () => {
@@ -109,7 +114,13 @@ const App = () => {
     setShowAddHabit(false);
     setNewHabitName('');
     setSelectedWCount(1);
+    setIsAddHabitVisible(false);
   };
+
+  const toggleAddHabit = () => {
+    setIsAddHabitVisible(!isAddHabitVisible);
+  };
+
 
   
 
@@ -117,11 +128,11 @@ const App = () => {
     <div className="App">
       <div className="EditButtonContainer">
         <button className="EditButton" onClick={handleAddHabitClick}>
-          <img src="editButton.png" alt="Edit Icon" />
+          <img src="editButton.png" alt="" />
         </button>
         {showAddHabit && (
           <div className="Dropdown">
-            <button onClick={handleAddNewHabit}>Add Habit</button>
+            <button onClick={toggleAddHabit}>Add Habit</button>
             <button>Delete Habit</button>
             <button>Reset</button>
           </div>
@@ -166,26 +177,26 @@ const App = () => {
           </tbody>
         </table>
       </div>
-      <div className="AddHabit">
-        <input
-          type="text"
-          placeholder="New Habit Name"
-          value={newHabitName}
-          onChange={(e) => setNewHabitName(e.target.value)}
-        />
-        <select
-          value={selectedWCount}
-          onChange={(e) => setSelectedWCount(e.target.value)}
-        >
-          <option disabled>Enter Possible W's</option>
-          <option value="1">1 W</option>
-          <option value="2">2 W's</option>
-          <option value="3">3 W's</option>
-          <option value="4">4 W's</option>
-          <option value="5">5 W's</option>
-        </select>
-        <button onClick={addNewHabit}>Add Habit +</button>
-      </div>
+      {isAddHabitVisible && (
+        <div className="AddHabit">
+          <input
+            type="text"
+            placeholder="New Habit Name"
+            value={newHabitName}
+            onChange={(e) => setNewHabitName(e.target.value)}
+          />
+          <select
+            value={selectedWCount}
+            onChange={(e) => setSelectedWCount(e.target.value)}
+          >
+            <option disabled>Enter Possible W's</option>
+            <option value="1">1 W</option>
+            <option value="2">2 W's</option>
+            <option value="3">3 W's</option>
+          </select>
+          <button onClick={handleAddNewHabit}>Add Habit +</button>
+        </div>
+      )}
     </div>
   );
 };
