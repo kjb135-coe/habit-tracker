@@ -8,13 +8,13 @@ const App = () => {
     { habit: 'Exercise', days: [0, 0, 0, 0, 0, 0, 0] },
     { habit: 'TODO List', days: [0, 0, 0, 0, 0, 0, 0] },
     { habit: 'Calendar', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'No Substances', days: [0, 0, 0, 0, 0, 0, 0] },
     { habit: 'Read 10 Pages', days: [0, 0, 0, 0, 0, 0, 0] },
     { habit: 'ST <3.5 Hours', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
+  const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
-  const [selectedWCount, setSelectedWCount] = useState('Enter Possible W\'s');  
+  const [selectedWCount, setSelectedWCount] = useState(1);
 
   // Click event handler for each cell
   const handleCellClick = (habitIndex, dayIndex) => {
@@ -85,10 +85,48 @@ const App = () => {
     setNewHabitName('');
     setSelectedWCount('Enter Possible W\'s');
   };
+
+  const handleAddHabitClick = () => {
+    setShowAddHabit(true);
+  };
+
+  const handleAddNewHabit = () => {
+    if (newHabitName.trim() === '') {
+      alert('Please enter a habit name.');
+      return;
+    }
+
+    const newHabit = {
+      habit: newHabitName,
+      days: new Array(7).fill(0),
+    };
+
+    for (let i = 0; i < selectedWCount; i++) {
+      newHabit.days[i] = 1;
+    }
+
+    setGridData([...gridData, newHabit]);
+    setShowAddHabit(false);
+    setNewHabitName('');
+    setSelectedWCount(1);
+  };
+
   
 
   return (
     <div className="App">
+      <div className="EditButtonContainer">
+        <button className="EditButton" onClick={handleAddHabitClick}>
+          <img src="editButton.png" alt="Edit Icon" />
+        </button>
+        {showAddHabit && (
+          <div className="Dropdown">
+            <button onClick={handleAddNewHabit}>Add Habit</button>
+            <button>Delete Habit</button>
+            <button>Reset</button>
+          </div>
+        )}
+      </div>
       <div className="GridContainer">
         <header className="App-header">
           <h1 className="App-title">Habit Tracker</h1>

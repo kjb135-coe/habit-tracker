@@ -138,3 +138,47 @@ td.green:hover, td.red:hover, td.middle:hover {
 .AddHabit input:hover {
   opacity: 1.0;
 }
+
+.EditButtonContainer {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.EditButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  background-image: url('editButton.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.Dropdown {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.Dropdown button {
+  background-color: transparent;
+  border: none;
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.Dropdown button:hover {
+  background-color: #f2f2f2;
+}

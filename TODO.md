@@ -7,6 +7,7 @@
     - Tutorial
 - "Reset Week" Button (just has reset icon), prompt a popup
 - Add "Edit" button which users are able to delete habits (just the edit icon)
+- Goal for the Week: score cell is highlighted different color based on whether or not they are on track to their goal
 
 DONE:
 - Fix Date Bug
