@@ -3,13 +3,7 @@ import React, { useState, useRef } from 'react';
 
 const App = () => {
   const [gridData, setGridData] = useState([
-    { habit: 'Sleep 7.5+ Hours', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Journal', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Exercise', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'TODO List', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Calendar', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Read 10 Pages', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'ST <3.5 Hours', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -17,35 +11,43 @@ const App = () => {
   const [selectedWCount, setSelectedWCount] = useState(1);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
+  const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
+  const [habitToDelete, setHabitToDelete] = useState(null); // New state to store the habit to delete
 
 
   // Click event handler for each cell
   const handleCellClick = (habitIndex, dayIndex) => {
     const newGridData = [...gridData];
     const currentValue = newGridData[habitIndex].days[dayIndex];
+    const selectedWCount = newGridData[habitIndex].selectedWCount; // Get selectedWCount for the habit
 
-    if (habitIndex === 2 || habitIndex === 3 || habitIndex === 6 || habitIndex === 7) {
-      if (currentValue === 0) newGridData[habitIndex].days[dayIndex] = 1;        // 1 green W
-      else if (currentValue === 1) newGridData[habitIndex].days[dayIndex] = 2;   // 2 green W
-      else if (currentValue === 2) newGridData[habitIndex].days[dayIndex] = 3;   // 3 green W
-      else if (currentValue === 3) newGridData[habitIndex].days[dayIndex] = -1;   // 1 red L
-      else newGridData[habitIndex].days[dayIndex] = 0;                          // Reset to blank
+    if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
+      // Handle when selectedWCount is not defined or set to 'Enter Max Points'
+      alert('Please select the max number of points for this habit.');
+      return;
     }
 
+    if (currentValue >= 0 && currentValue < selectedWCount) {
+      // Increment the cell value within the selectedWCount limit
+      newGridData[habitIndex].days[dayIndex] = currentValue + 1;
+    } 
+    else if (currentValue === selectedWCount) {
+      newGridData[habitIndex].days[dayIndex] = -1; // Set to -1 if it reaches selectedWCount
+    }
     else {
-      if (currentValue === 0) newGridData[habitIndex].days[dayIndex] = 1;        // 1 green W
-      else if (currentValue === 1) newGridData[habitIndex].days[dayIndex] = -1;   // 1 red L
-      else newGridData[habitIndex].days[dayIndex] = 0;                          // Reset to blank
+      // Reset to blank if it exceeds selectedWCount
+      newGridData[habitIndex].days[dayIndex] = 0;
     }
 
     setGridData(newGridData);
   };
 
+
   const calculateScore = () => {
     let score = 0;
     gridData.forEach((habit) => {
       habit.days.forEach((value) => {
-        if(value != -1) score += value;
+        if (value != -1) score += value;
       });
     });
     return score;
@@ -54,44 +56,23 @@ const App = () => {
   const getCurrentWeekDates = () => {
     const currentDate = new Date();
     const currentDay = currentDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-  
+
     // Calculate the number of days to subtract to get to the start of the week (Monday)
     const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-  
+
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(currentDate);
       date.setDate(currentDate.getDate() - daysUntilMonday + i);
       weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
     }
-  
-    return weekDates;
-  };
 
-  
-  const addNewHabit = () => {
-    if (!newHabitName || selectedWCount === 'Enter Possible W\'s') {
-      alert('Please enter a habit name and select the number of W\'s.');
-      return;
-    }
-  
-    const newHabit = {
-      habit: newHabitName,
-      days: Array(7).fill(0),
-    };
-  
-    for (let i = 0; i < parseInt(selectedWCount); i++) {
-      newHabit.days[i] = 1;
-    }
-  
-    setGridData([...gridData, newHabit]);
-    setNewHabitName('');
-    setSelectedWCount('Enter Possible W\'s');
+    return weekDates;
   };
 
   const handleAddHabitClick = () => {
     setIsDropdownVisible(!isDropdownVisible);
-    if(isDropdownVisible) setShowAddHabit(true);
+    if (isDropdownVisible) setShowAddHabit(true);
     else setShowAddHabit(false);
   };
 
@@ -104,16 +85,19 @@ const App = () => {
     const newHabit = {
       habit: newHabitName,
       days: new Array(7).fill(0),
+      selectedWCount: parseInt(selectedWCount),
     };
 
-    for (let i = 0; i < selectedWCount; i++) {
-      newHabit.days[i] = 1;
+    // Replace the initial "Click the edit icon!" habit with the new habit
+    if (gridData.length === 1 && gridData[0].habit === 'Click the edit icon!') {
+      setGridData([newHabit]);
+    } else {
+      setGridData([...gridData, newHabit]);
     }
 
-    setGridData([...gridData, newHabit]);
     setShowAddHabit(false);
     setNewHabitName('');
-    setSelectedWCount(1);
+    setSelectedWCount(selectedWCount);
     setIsAddHabitVisible(false);
   };
 
@@ -121,8 +105,18 @@ const App = () => {
     setIsAddHabitVisible(!isAddHabitVisible);
   };
 
+  const handleDeleteHabitClick = () => {
+    setIsDeleteDropdownVisible(!isDeleteDropdownVisible);
+  };
 
-  
+  const handleHabitDelete = (habitIndex) => {
+    if (window.confirm('Are you sure you want to delete this habit?')) {
+      const updatedGridData = [...gridData];
+      updatedGridData.splice(habitIndex, 1); // Remove the habit at the specified index
+      setGridData(updatedGridData);
+      setIsDeleteDropdownVisible(false);
+    }
+  };
 
   return (
     <div className="App">
@@ -133,7 +127,22 @@ const App = () => {
         {showAddHabit && (
           <div className="Dropdown">
             <button onClick={toggleAddHabit}>Add Habit</button>
-            <button>Delete Habit</button>
+            <button className="DeleteButton" onClick={handleDeleteHabitClick}>
+          Delete Habit
+        </button>
+        {isDeleteDropdownVisible && (
+          <div className="DeleteDropdown">
+            {gridData.map((habit, habitIndex) => (
+              <button
+                className="DeleteHabitButton"
+                key={habitIndex}
+                onClick={() => handleHabitDelete(habitIndex)}
+              >
+                {habit.habit}
+              </button>
+            ))}
+          </div>
+        )}
             <button>Reset</button>
           </div>
         )}
@@ -189,10 +198,10 @@ const App = () => {
             value={selectedWCount}
             onChange={(e) => setSelectedWCount(e.target.value)}
           >
-            <option disabled>Enter Possible W's</option>
-            <option value="1">1 W</option>
-            <option value="2">2 W's</option>
-            <option value="3">3 W's</option>
+            <option disabled>Enter Max Points</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
           </select>
           <button onClick={handleAddNewHabit}>Add Habit +</button>
         </div>
