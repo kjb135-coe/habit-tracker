@@ -182,3 +182,32 @@ td.green:hover, td.red:hover, td.middle:hover {
 .Dropdown button:hover {
   background-color: #f2f2f2;
 }
+
+.BottomSection {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  margin-top: auto; /* Push BottomSection to the bottom */
+}
+
+.SubmittedScores {
+  margin-top: 20px;
+}
+
+.SubmittedScores h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.SubmittedScores table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.SubmittedScores th, .SubmittedScores td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ccc;
+}

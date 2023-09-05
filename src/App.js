@@ -4,6 +4,15 @@ import React, { useState, useRef } from 'react';
 const App = () => {
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -13,8 +22,9 @@ const App = () => {
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [habitToDelete, setHabitToDelete] = useState(null); // New state to store the habit to delete
+  const [submittedScores, setSubmittedScores] = useState([]);
 
-
+  //#region Handlers
   // Click event handler for each cell
   const handleCellClick = (habitIndex, dayIndex) => {
     const newGridData = [...gridData];
@@ -30,7 +40,7 @@ const App = () => {
     if (currentValue >= 0 && currentValue < selectedWCount) {
       // Increment the cell value within the selectedWCount limit
       newGridData[habitIndex].days[dayIndex] = currentValue + 1;
-    } 
+    }
     else if (currentValue === selectedWCount) {
       newGridData[habitIndex].days[dayIndex] = -1; // Set to -1 if it reaches selectedWCount
     }
@@ -39,35 +49,27 @@ const App = () => {
       newGridData[habitIndex].days[dayIndex] = 0;
     }
 
+    const currentWeek = getCurrentWeekDates().join(' - ');
+
+    // Check if the current week's score has already been submitted
+    if (submittedScores.length === 0 || submittedScores[0].week !== currentWeek) {
+      // Add the current week's score if it hasn't been submitted
+      setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
+    }
+
     setGridData(newGridData);
   };
 
+  const handleSubmitScore = () => {
+    if (window.confirm('Are you sure you want to submit your score for this week?')) {
+      const currentWeek = getCurrentWeekDates().join(' - ');
 
-  const calculateScore = () => {
-    let score = 0;
-    gridData.forEach((habit) => {
-      habit.days.forEach((value) => {
-        if (value != -1) score += value;
-      });
-    });
-    return score;
-  };
-
-  const getCurrentWeekDates = () => {
-    const currentDate = new Date();
-    const currentDay = currentDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-
-    // Calculate the number of days to subtract to get to the start of the week (Monday)
-    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() - daysUntilMonday + i);
-      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
+      // Check if the current week's score has already been submitted
+      if (submittedScores.length === 0 || submittedScores[0].week !== currentWeek) {
+        // Add the current week's score if it hasn't been submitted
+        setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
+      }
     }
-
-    return weekDates;
   };
 
   const handleAddHabitClick = () => {
@@ -117,6 +119,57 @@ const App = () => {
       setIsDeleteDropdownVisible(false);
     }
   };
+  //#endregion
+
+  const calculateScore = () => {
+    let score = 0;
+    gridData.forEach((habit) => {
+      habit.days.forEach((value) => {
+        if (value != -1) score += value;
+      });
+    });
+    return score;
+  };
+
+  const getCurrentWeekDates = () => {
+    const currentDate = new Date();
+    const currentDay = currentDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+
+    // Calculate the number of days to subtract to get to the start of the week (Monday)
+    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
+
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(currentDate);
+      date.setDate(currentDate.getDate() - daysUntilMonday + i);
+      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
+    }
+
+    return weekDates;
+  };
+
+  // Component to display the submitted scores
+  const SubmittedScoresTable = ({ scores }) => (
+    <div className="SubmittedScores">
+      <h2>Weekly Scores</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scores.map((score, index) => (
+            <tr key={index}>
+              <td>{score.week}</td>
+              <td>{score.score}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <div className="App">
@@ -126,23 +179,24 @@ const App = () => {
         </button>
         {showAddHabit && (
           <div className="Dropdown">
+            <button onClick={handleSubmitScore}>Submit Score</button>
             <button onClick={toggleAddHabit}>Add Habit</button>
             <button className="DeleteButton" onClick={handleDeleteHabitClick}>
-          Delete Habit
-        </button>
-        {isDeleteDropdownVisible && (
-          <div className="DeleteDropdown">
-            {gridData.map((habit, habitIndex) => (
-              <button
-                className="DeleteHabitButton"
-                key={habitIndex}
-                onClick={() => handleHabitDelete(habitIndex)}
-              >
-                {habit.habit}
-              </button>
-            ))}
-          </div>
-        )}
+              Delete Habit
+            </button>
+            {isDeleteDropdownVisible && (
+              <div className="DeleteDropdown">
+                {gridData.map((habit, habitIndex) => (
+                  <button
+                    className="DeleteHabitButton"
+                    key={habitIndex}
+                    onClick={() => handleHabitDelete(habitIndex)}
+                  >
+                    {habit.habit}
+                  </button>
+                ))}
+              </div>
+            )}
             <button>Reset</button>
           </div>
         )}
@@ -186,26 +240,29 @@ const App = () => {
           </tbody>
         </table>
       </div>
-      {isAddHabitVisible && (
-        <div className="AddHabit">
-          <input
-            type="text"
-            placeholder="New Habit Name"
-            value={newHabitName}
-            onChange={(e) => setNewHabitName(e.target.value)}
-          />
-          <select
-            value={selectedWCount}
-            onChange={(e) => setSelectedWCount(e.target.value)}
-          >
-            <option disabled>Enter Max Points</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-          <button onClick={handleAddNewHabit}>Add Habit +</button>
-        </div>
-      )}
+      <div className="Footer">
+        <SubmittedScoresTable scores={submittedScores} />
+        {isAddHabitVisible && (
+          <div className="AddHabit">
+            <input
+              type="text"
+              placeholder="New Habit Name"
+              value={newHabitName}
+              onChange={(e) => setNewHabitName(e.target.value)}
+            />
+            <select
+              value={selectedWCount}
+              onChange={(e) => setSelectedWCount(e.target.value)}
+            >
+              <option disabled>Enter Max Points</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+            <button onClick={handleAddNewHabit}>Add Habit +</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
