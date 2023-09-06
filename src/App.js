@@ -4,15 +4,6 @@ import React, { useState, useEffect  } from 'react';
 const App = () => {
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -21,7 +12,6 @@ const App = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
-  const [habitToDelete, setHabitToDelete] = useState(null); // New state to store the habit to delete
   const [submittedScores, setSubmittedScores] = useState([]);
   const [currentWeekScore, setCurrentWeekScore] = useState(0);
 
