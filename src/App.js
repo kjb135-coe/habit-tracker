@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect  } from 'react';
 
 const App = () => {
   const [gridData, setGridData] = useState([
@@ -23,6 +23,12 @@ const App = () => {
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [habitToDelete, setHabitToDelete] = useState(null); // New state to store the habit to delete
   const [submittedScores, setSubmittedScores] = useState([]);
+  const [currentWeekScore, setCurrentWeekScore] = useState(0);
+
+  useEffect(() => {
+    // Calculate the current week's score whenever the gridData or submittedScores change
+    setCurrentWeekScore(calculateScore());
+  }, [gridData, submittedScores]);
 
   //#region Handlers
   // Click event handler for each cell
@@ -57,18 +63,16 @@ const App = () => {
       setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
     }
 
+    setCurrentWeekScore(calculateScore());
     setGridData(newGridData);
   };
 
   const handleSubmitScore = () => {
     if (window.confirm('Are you sure you want to submit your score for this week?')) {
       const currentWeek = getCurrentWeekDates().join(' - ');
+      setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
 
-      // Check if the current week's score has already been submitted
-      if (submittedScores.length === 0 || submittedScores[0].week !== currentWeek) {
-        // Add the current week's score if it hasn't been submitted
-        setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
-      }
+      setCurrentWeekScore(calculateScore());
     }
   };
 
@@ -149,27 +153,48 @@ const App = () => {
   };
 
   // Component to display the submitted scores
-  const SubmittedScoresTable = ({ scores }) => (
-    <div className="SubmittedScores">
-      <h2>Weekly Scores</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Week</th>
-            <th>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {scores.map((score, index) => (
-            <tr key={index}>
-              <td>{score.week}</td>
-              <td>{score.score}</td>
+  const SubmittedScoresTable = ({ scores, setScores }) => {
+    const weeksToShow = 4; // Number of weeks to show
+    const displayedScores = [];
+
+    // Create an array of week date strings for the last four weeks
+    for (let i = 0; i < weeksToShow; i++) {
+      const weekStartDate = new Date();
+      weekStartDate.setDate(weekStartDate.getDate() - (i * 7));
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekEndDate.getDate() + 6);
+
+      const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
+
+      // Find the score for this week, or default to 0
+      const score = scores.find((s) => s.week === week)?.score || 0;
+
+      displayedScores.push({ week, score });
+    }
+
+    return (
+      <div className="SubmittedScores">
+        <h2>Weekly Scores</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Score</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {displayedScores.map((score, index) => (
+              <tr key={index}>
+                <td>{score.week}</td>
+                <td>{score.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
 
   return (
     <div className="App">
@@ -241,7 +266,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={submittedScores} />
+        <SubmittedScoresTable scores={submittedScores} currentWeekScore={currentWeekScore} calculateScore={calculateScore}/>
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input

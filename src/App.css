@@ -99,10 +99,11 @@ td.green:hover, td.red:hover, td.middle:hover {
 
 .AddHabit {
   display: flex;
+  position: fixed;
+  right: 200px;
+  bottom: 60px;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 50px;
 }
 
 .AddHabit input[type="text"],
@@ -183,16 +184,17 @@ td.green:hover, td.red:hover, td.middle:hover {
   background-color: #f2f2f2;
 }
 
-.BottomSection {
+.Footer {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 20px;
   margin-top: auto; /* Push BottomSection to the bottom */
 }
 
 .SubmittedScores {
-  margin-top: 20px;
+  position: fixed;
+  left: 200px;
+  bottom: 60px;
 }
 
 .SubmittedScores h2 {
