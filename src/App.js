@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState, useEffect  } from 'react';
+import React, { useState  } from 'react';
 
 const App = () => {
   const [gridData, setGridData] = useState([
@@ -12,13 +12,30 @@ const App = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
-  const [submittedScores, setSubmittedScores] = useState([]);
-  const [currentWeekScore, setCurrentWeekScore] = useState(0);
+  const [scoresData, setScoresData] = useState([]);
 
-  useEffect(() => {
-    // Calculate the current week's score whenever the gridData or submittedScores change
-    setCurrentWeekScore(calculateScore());
-  }, [gridData, submittedScores]);
+
+  const updateScoresData = () => {
+    const newScoresData = [];
+  
+    gridData.forEach((habit) => {
+      const habitScore = habit.days.reduce((acc, value) => {
+        if (value >= 1 && value <= 3) {
+          acc += value;
+        }
+        return acc;
+      }, 0);
+  
+      newScoresData.push({
+        habit: habit.habit,
+        scores: habit.days,
+        totalScore: habitScore,
+      });
+    });
+  
+    setScoresData([...newScoresData]);
+  };
+  
 
   //#region Handlers
   // Click event handler for each cell
@@ -45,24 +62,13 @@ const App = () => {
       newGridData[habitIndex].days[dayIndex] = 0;
     }
 
-    const currentWeek = getCurrentWeekDates().join(' - ');
-
-    // Check if the current week's score has already been submitted
-    if (submittedScores.length === 0 || submittedScores[0].week !== currentWeek) {
-      // Add the current week's score if it hasn't been submitted
-      setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
-    }
-
-    setCurrentWeekScore(calculateScore());
     setGridData(newGridData);
+    updateScoresData();
   };
 
   const handleSubmitScore = () => {
     if (window.confirm('Are you sure you want to submit your score for this week?')) {
-      const currentWeek = getCurrentWeekDates().join(' - ');
-      setSubmittedScores([{ week: currentWeek, score: calculateScore() }, ...submittedScores.slice(0, 3)]);
-
-      setCurrentWeekScore(calculateScore());
+      updateScoresData();
     }
   };
 
@@ -143,16 +149,18 @@ const App = () => {
   };
 
   // Component to display the submitted scores
-  const SubmittedScoresTable = ({ scores, setScores }) => {
+  const SubmittedScoresTable = ({ scores }) => {
     const weeksToShow = 4; // Number of weeks to show
     const displayedScores = [];
 
     // Create an array of week date strings for the last four weeks
     for (let i = 0; i < weeksToShow; i++) {
-      const weekStartDate = new Date();
-      weekStartDate.setDate(weekStartDate.getDate() - (i * 7));
+      const currentDate = new Date();
+      const daysUntilMonday = (currentDate.getDay() + 6) % 7; // Calculate days until the previous Monday
+      const weekStartDate = new Date(currentDate);
+      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday - i * 7);
       const weekEndDate = new Date(weekStartDate);
-      weekEndDate.setDate(weekEndDate.getDate() + 6);
+      weekEndDate.setDate(weekStartDate.getDate() + 6);
 
       const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
 
@@ -161,6 +169,7 @@ const App = () => {
 
       displayedScores.push({ week, score });
     }
+
 
     return (
       <div className="SubmittedScores">
@@ -256,7 +265,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={submittedScores} currentWeekScore={currentWeekScore} calculateScore={calculateScore}/>
+        <SubmittedScoresTable scores={scoresData} />
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
