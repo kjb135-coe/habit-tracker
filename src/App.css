@@ -161,27 +161,30 @@ td.green:hover, td.red:hover, td.middle:hover {
 
 .Dropdown {
   position: absolute;
-  top: 70px;
-  right: 20px;
+  top: 50px;
+  right: 10px;
   background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* Increased border radius for a softer look */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Enhanced box shadow for depth */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px; /* Increased padding for better spacing */
   z-index: 1000;
+  width: 150px; /* Adjust the width as needed */
 }
 
 .Dropdown button {
   background-color: transparent;
   border: none;
-  padding: 5px 10px;
+  padding: 5px; /* Increased padding for better touch/click targets */
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth background color transition */
 }
 
 .Dropdown button:hover {
-  background-color: #f2f2f2;
+  background-color: #f2f2f2; /* Hover background color */
+  border-radius: 5px; /* Rounded corners on hover */
 }
 
 .Footer {
@@ -212,4 +215,16 @@ td.green:hover, td.red:hover, td.middle:hover {
   padding: 8px;
   text-align: center;
   border: 1px solid #ccc;
+}
+
+/* Style for the green checkmark emoji */
+.green-emoji {
+  font-size: 18px; /* Adjust the font size as needed */
+  color: green; /* Change the color to match your design */
+}
+
+/* Style for the red x emoji */
+.red-emoji {
+  font-size: 18px; /* Adjust the font size as needed */
+  color: red; /* Change the color to match your design */
 }

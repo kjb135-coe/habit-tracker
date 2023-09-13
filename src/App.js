@@ -1,5 +1,9 @@
 import './App.css';
-import React, { useState  } from 'react';
+import React, { useState } from 'react';
+// Import emoji symbols
+import checkmark from './checkmark.png';
+import xmark from './xmark.png';
+
 
 const App = () => {
   const [gridData, setGridData] = useState([
@@ -17,7 +21,7 @@ const App = () => {
 
   const updateScoresData = () => {
     const newScoresData = [];
-  
+
     gridData.forEach((habit) => {
       const habitScore = habit.days.reduce((acc, value) => {
         if (value >= 1 && value <= 3) {
@@ -25,17 +29,17 @@ const App = () => {
         }
         return acc;
       }, 0);
-  
+
       newScoresData.push({
         habit: habit.habit,
         scores: habit.days,
         totalScore: habitScore,
       });
     });
-  
+
     setScoresData([...newScoresData]);
   };
-  
+
 
   //#region Handlers
   // Click event handler for each cell
@@ -84,6 +88,13 @@ const App = () => {
       return;
     }
 
+    if (gridData.length >= 10) {
+      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 10 or less');
+      setShowAddHabit(false);
+      setIsAddHabitVisible(false);
+      return;
+    }
+
     const newHabit = {
       habit: newHabitName,
       days: new Array(7).fill(0),
@@ -119,6 +130,19 @@ const App = () => {
       setIsDeleteDropdownVisible(false);
     }
   };
+
+  const handleResetWeek = () => {
+    // Prompt the user for confirmation
+    const confirmReset = window.confirm('Are you sure you want to reset this week? This action cannot be undone.');
+  
+    if (confirmReset) {
+      setShowAddHabit(false);
+      // Create a new gridData with all zeros for the current week
+      const initialWeekData = { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] };
+      setGridData([initialWeekData]);
+    }
+  };
+  
   //#endregion
 
   const calculateScore = () => {
@@ -224,7 +248,7 @@ const App = () => {
                 ))}
               </div>
             )}
-            <button>Reset</button>
+            <button onClick={handleResetWeek}>Reset Week</button>
           </div>
         )}
       </div>
@@ -253,7 +277,15 @@ const App = () => {
                     }
                     onClick={() => handleCellClick(habitIndex, dayIndex)}
                   >
-                    {value >= 1 && value <= 3 ? 'W'.repeat(value) : value === -1 ? 'L' : ''}
+                    {value >= 1 && value <= 3
+                      ? Array.from({ length: value }, (v, i) => (
+                        <span key={i} className="green-emoji">
+                          ✅
+                        </span>
+                      ))
+                      : value === -1
+                        ? <span className="red-emoji">❌</span>
+                        : ''}
                   </td>
                 ))}
               </tr>
