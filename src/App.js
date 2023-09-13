@@ -153,6 +153,9 @@ const App = () => {
     const weeksToShow = 4; // Number of weeks to show
     const displayedScores = [];
 
+    // Calculate the score for the first week
+    const firstWeekScore = calculateScore();
+
     // Create an array of week date strings for the last four weeks
     for (let i = 0; i < weeksToShow; i++) {
       const currentDate = new Date();
@@ -185,7 +188,7 @@ const App = () => {
             {displayedScores.map((score, index) => (
               <tr key={index}>
                 <td>{score.week}</td>
-                <td>{score.score}</td>
+                <td>{index === 0 ? firstWeekScore : score.score}</td>
               </tr>
             ))}
           </tbody>
