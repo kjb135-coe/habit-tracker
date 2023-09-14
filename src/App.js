@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState } from 'react';
-// import { Line } from 'react-chartjs-2';
+import LineChart from './LineChart';
+
 const App = () => {
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
@@ -199,7 +200,6 @@ const App = () => {
 
     return (
       <div className="SubmittedScores">
-        <h2>Weekly Scores</h2>
         <table>
           <thead>
             <tr>
@@ -321,6 +321,7 @@ const App = () => {
             <button onClick={handleAddNewHabit}>Add Habit +</button>
           </div>
         )}
+        <LineChart />
       </div>
     </div>
   );
