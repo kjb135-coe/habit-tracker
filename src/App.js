@@ -1,10 +1,6 @@
 import './App.css';
 import React, { useState } from 'react';
-// Import emoji symbols
-import checkmark from './checkmark.png';
-import xmark from './xmark.png';
-
-
+// import { Line } from 'react-chartjs-2';
 const App = () => {
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
