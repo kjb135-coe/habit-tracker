@@ -68,6 +68,8 @@ const App = () => {
 
     setGridData(newGridData);
     updateScoresData();
+    setShowAddHabit(false);
+    setIsAddHabitVisible(false);
   };
 
   const handleSubmitScore = () => {
@@ -145,6 +147,7 @@ const App = () => {
   
   //#endregion
 
+  //#region Helper Functions
   const calculateScore = () => {
     let score = 0;
     gridData.forEach((habit) => {
@@ -220,8 +223,9 @@ const App = () => {
       </div>
     );
   };
+  //#endregion
 
-
+  //#region Render (HTML)
   return (
     <div className="App">
       <div className="EditButtonContainer">
@@ -324,6 +328,7 @@ const App = () => {
       </div>
     </div>
   );
+  //#endregion
 };
 
 export default App;

@@ -170,7 +170,7 @@ td.green:hover, td.red:hover, td.middle:hover {
   flex-direction: column;
   padding: 10px; /* Increased padding for better spacing */
   z-index: 1000;
-  width: 150px; /* Adjust the width as needed */
+  width: 125px; /* Adjust the width as needed */
 }
 
 .Dropdown button {
