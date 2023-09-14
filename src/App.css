@@ -189,10 +189,13 @@ td.green:hover, td.red:hover, td.middle:hover {
 
 .Footer {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: auto; /* Push BottomSection to the bottom */
+  flex-direction: column; /* Change to a column layout */
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  height: 100%; /* Ensure the Footer takes up the entire height */
+  padding-bottom: 60px;
 }
+
 
 .SubmittedScores {
   position: fixed;

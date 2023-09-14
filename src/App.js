@@ -87,8 +87,8 @@ const App = () => {
       return;
     }
 
-    if (gridData.length >= 10) {
-      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 10 or less');
+    if (gridData.length >= 8) {
+      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 8 or less');
       setShowAddHabit(false);
       setIsAddHabitVisible(false);
       return;
