@@ -340,6 +340,7 @@ const App = () => {
             <button onClick={handleAddNewHabit}>Add Habit +</button>
           </div>
         )}
+        <p>&copy; 2023 Trackr v1.0.0</p>
         {/* <LineChart /> */}
       </div>
     </div>
