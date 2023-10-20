@@ -155,12 +155,17 @@ const App = () => {
   const handleResetWeek = () => {
     // Prompt the user for confirmation
     const confirmReset = window.confirm('Are you sure you want to reset this week? This action cannot be undone.');
-  
+    
     if (confirmReset) {
       setShowAddHabit(false);
-      // Create a new gridData with all zeros for the current week
-      const initialWeekData = { habit: 'Habit #1', days: [0, 0, 0, 0, 0, 0, 0] };
-      setGridData([initialWeekData]);
+      // Create a new gridData by resetting all days to 0 for the current habits
+      const newGridData = gridData.map((habit) => {
+        return {
+          habit: habit.habit,
+          days: [0, 0, 0, 0, 0, 0, 0],
+        };
+      });
+      setGridData(newGridData);
     }
   };
 
@@ -351,7 +356,7 @@ const App = () => {
               <option value="2">2</option>
               <option value="3">3</option>
             </select>
-            <button onClick={handleAddNewHabit}>Add Habit +</button>
+            <button onClick={handleAddNewHabit}>Add</button>
           </div>
         )}
         <p>&copy; 2023 Trackr v1.0.0</p>
