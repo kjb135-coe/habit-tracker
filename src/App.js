@@ -287,7 +287,7 @@ const App = () => {
       </div>
       <div className="GridContainer">
         <header className="App-header">
-          <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr🚀`}</h1>
+          <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr 🚀`}</h1>
         </header>
         <table>
           <thead>

@@ -16,6 +16,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
     <div className="startup-popup">
       <h2>Welcome to Trackr! 😄</h2>
       <p>Get started by entering your name:</p>
+      <div className="input-button-container">
       <input
         type="text"
         placeholder="Your Name"
@@ -28,9 +29,10 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
           }
         }}
       />
-        <button className="StartTrackingButton" onClick={handleSubmit}>
-          Start Tracking
-        </button>
+      <button className="StartTrackingButton" onClick={handleSubmit}>
+        Done
+      </button>
+    </div>
     </div>
   );
 };
