@@ -14,6 +14,7 @@ const App = () => {
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [scoresData, setScoresData] = useState([]);
+  const [currentWeek, setCurrentWeek] = useState(0);
 
 
   const updateScoresData = () => {
@@ -71,7 +72,25 @@ const App = () => {
 
   const handleSubmitScore = () => {
     if (window.confirm('Are you sure you want to submit your score for this week?')) {
-      updateScoresData();
+      // Store the score for the current week
+      const newScoresData = [...scoresData];
+      const currentDate = new Date();
+      const daysUntilMonday = (currentDate.getDay() + 6) % 7;
+      const weekStartDate = new Date(currentDate);
+      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday - currentWeek * 7);
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekStartDate.getDate() + 6);
+
+      const weekLabel = `${weekStartDate.toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+      })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
+
+      newScoresData.push({ week: weekLabel, score: calculateScore() });
+      setScoresData(newScoresData);
+
+      // Increment the current week
+      setCurrentWeek(currentWeek + 1);
     }
   };
 
