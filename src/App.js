@@ -4,7 +4,7 @@ import LineChart from './LineChart';
 
 const App = () => {
   const [gridData, setGridData] = useState([
-    { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -47,7 +47,7 @@ const App = () => {
 
     if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
       // Handle when selectedWCount is not defined or set to 'Enter Max Points'
-      alert('Please select the max number of points for this habit.');
+      alert('Please add a habit or select the max number of points for this habit.');
       return;
     }
 
@@ -101,7 +101,7 @@ const App = () => {
     };
 
     // Replace the initial "Click the edit icon!" habit with the new habit
-    if (gridData.length === 1 && gridData[0].habit === 'Click the edit icon!') {
+    if (gridData.length === 1 && gridData[0].habit === 'Click the edit icon and "Add Habit".') {
       setGridData([newHabit]);
     } else {
       setGridData([...gridData, newHabit]);
@@ -137,7 +137,7 @@ const App = () => {
     if (confirmReset) {
       setShowAddHabit(false);
       // Create a new gridData with all zeros for the current week
-      const initialWeekData = { habit: 'Click the edit icon!', days: [0, 0, 0, 0, 0, 0, 0] };
+      const initialWeekData = { habit: 'Habit #1', days: [0, 0, 0, 0, 0, 0, 0] };
       setGridData([initialWeekData]);
     }
   };
@@ -321,7 +321,7 @@ const App = () => {
             <button onClick={handleAddNewHabit}>Add Habit +</button>
           </div>
         )}
-        <LineChart />
+        {/* <LineChart /> */}
       </div>
     </div>
   );
