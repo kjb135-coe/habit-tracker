@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState } from 'react';
 import LineChart from './LineChart';
+import StartupPopup from './StartupPopup';
 
 const App = () => {
   const [gridData, setGridData] = useState([
@@ -15,6 +16,8 @@ const App = () => {
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [scoresData, setScoresData] = useState([]);
   const [currentWeek, setCurrentWeek] = useState(0);
+  const [showStartupPopup, setShowStartupPopup] = useState(true);
+  const [userName, setUserName] = useState('')
 
 
   const updateScoresData = () => {
@@ -160,6 +163,14 @@ const App = () => {
       setGridData([initialWeekData]);
     }
   };
+
+  const handleNameSubmit = (name) => {
+    // Set the user's name when it's submitted
+    setUserName(name);
+
+    // Close the startup popup
+    setShowStartupPopup(false);
+  };
   
   //#endregion
 
@@ -243,6 +254,9 @@ const App = () => {
   //#region Render (HTML)
   return (
     <div className="App">
+      {showStartupPopup && ( // Render the popup if showStartupPopup is true
+        <StartupPopup onClose={() => setShowStartupPopup(false)} onNameSubmit={handleNameSubmit} />
+      )}
       <div className="EditButtonContainer">
         <button className="EditButton" onClick={handleAddHabitClick}>
           <img src="editButton.png" alt="" />
@@ -273,7 +287,7 @@ const App = () => {
       </div>
       <div className="GridContainer">
         <header className="App-header">
-          <h1 className="App-title">Habit Tracker</h1>
+          <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr🚀`}</h1>
         </header>
         <table>
           <thead>
