@@ -154,7 +154,7 @@ const App = () => {
 
   const handleResetWeek = () => {
     // Prompt the user for confirmation
-    const confirmReset = window.confirm('Are you sure you want to reset this week? This action cannot be undone.');
+    const confirmReset = window.confirm('Are you sure you want to reset this week?');
     
     if (confirmReset) {
       setShowAddHabit(false);
