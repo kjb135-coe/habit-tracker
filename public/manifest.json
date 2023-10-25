@@ -1,7 +1,7 @@
 {
   "short_name": "Trackr",
   "name": "Trackr",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "manifest_version": 3,
   "author": "Keegan Borig",
   "permissions": [
