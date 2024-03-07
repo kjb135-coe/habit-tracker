@@ -1,51 +1,31 @@
-// background.js
+// https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/events
 
-// Initialize the habit data if it doesn't exist in storage
-chrome.storage.sync.get(['habitData'], function(result) {
-    if (!result.habitData) {
-      const initialHabitData = { habits: [] };
-      chrome.storage.sync.set({ habitData: initialHabitData });
-    }
-  });
-  
-  // Listen for changes in habit data from content scripts
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === 'updateHabitData') {
-      const updatedHabitData = request.habitData;
-  
-      // Save the updated habit data to storage
-      chrome.storage.sync.set({ habitData: updatedHabitData }, function() {
-        console.log('Habit data updated:', updatedHabitData);
-      });
-    }
-  });
-  
-  // Function to retrieve the habit data from storage
-  function getHabitData(callback) {
-    chrome.storage.sync.get(['habitData'], function(result) {
-      callback(result.habitData || { habits: [] });
-    });
-  }
+// A background workers operates in the "background" between windows and/or tabs
+// Used for tasks that persist beyond the lifecycle of a window or tab, i.e. maintaining a state
 
-// Initialize user data
-let userData = { name: '', habits: [] };
+// SERVICE WORKERS ACCESS DOM STUFF
+// NO ACCESS TO ELEMENTS
+// BUT SERVICE WORKER MUST SEND REQUESTS TO BACKGROUND WORKER
 
-// Load user data from storage on extension startup
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get('userData', (result) => {
-    if (result.userData) {
-      userData = result.userData;
-    }
-  });
+// TIPS
+// 1. Do not couple/nest event declarations
+
+// Let us see how many tabs are created 
+chrome.tabs.onCreated.addListener(function (tab) {
+    console.log('Tab created: ', tab.id);
 });
 
-// Listen for messages from content scripts
+// Username: listens to App.js, sends to content service worker 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'get-user-data') {
-    sendResponse(userData);
-  } else if (request.action === 'update-user-data') {
-    userData = request.data;
-    // Save the updated user data to storage
-    chrome.storage.sync.set({ userData });
-  }
+    // Check if request action regards submitted name
+    if (request.action === "nameSubmitted") {
+        const name = request.name;
+
+        // Send message regarding username submission to all open tabs
+        chrome.tabs.query({}, (tabs) => {
+            for(let i = 0; i < tabs.length; i++) {
+                chrome.tabs.sendMessage(tabs[i].id, { action: "updateName", name: name });
+            }
+        });
+    }
 });
