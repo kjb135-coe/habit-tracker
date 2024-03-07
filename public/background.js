@@ -1,3 +1,5 @@
+/* global chrome */
+
 // https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/events
 
 // A background workers operates in the "background" between windows and/or tabs

@@ -1,3 +1,5 @@
+/* global chrome */
+
 import './App.css';
 import React, { useState } from 'react';
 import LineChart from './LineChart';
@@ -40,27 +42,6 @@ const App = () => {
 
     setScoresData([...newScoresData]);
   };
-
-  window.addEventListener("message", (event) => {
-    // Only accept messages from the same frame
-    if (event.source !== window) {
-      return;
-    }
-  
-    const message = event.data;
-  
-    // Only accept messages of type "FROM_CONTENT"
-    if (typeof message !== 'object' || message === null || message.type !== "FROM_CONTENT") {
-      return;
-    }
-  
-    if (message.action === "updateName") {
-      const name = message.name;
-  
-      // Update the name
-      setUserName(name);
-    }
-  });
 
   //#region Handlers
   // Click event handler for each cell
@@ -197,7 +178,7 @@ const App = () => {
     setShowStartupPopup(false);
 
     // Send message to background script
-    chrome.runtime.sendMessage({action: "nameSubmitted", name: name})
+    // chrome.runtime.sendMessage({action: "nameSubmitted", name: name})
   };
   
   //#endregion
