@@ -1,11 +1,13 @@
 /* global chrome */
 
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
 
 const App = () => {
+
+  //#region variables
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
@@ -20,6 +22,72 @@ const App = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('')
+  //#endregion
+
+  // Communcation for background/content workers
+  // Trigerred whenever any of the states listed are changed
+  useEffect(() => {
+    // Store the state in memory using chrome.storage.sync
+    chrome.storage.sync.set({
+      state: {
+        gridData,
+        showAddHabit,
+        newHabitName,
+        selectedWCount,
+        isDropdownVisible,
+        isAddHabitVisible,
+        isDeleteDropdownVisible,
+        scoresData,
+        currentWeek,
+        showStartupPopup,
+        userName,
+      }
+    });
+  }, [
+    gridData,
+    showAddHabit,
+    newHabitName,
+    selectedWCount,
+    isDropdownVisible,
+    isAddHabitVisible,
+    isDeleteDropdownVisible,
+    scoresData,
+    currentWeek,
+    showStartupPopup,
+    userName,
+  ]);
+
+  useEffect(() => {
+    function handleMessage(event) {
+      // Only trust messages from the same frame
+      if (event.source !== window) return;
+
+      // Only process messages that we sent
+      // Set states if each variable
+      if (event.data.type && event.data.type === 'FROM_CONTENT_SCRIPT') {
+        const payload = event.data.payload;
+        setGridData(payload.gridData);
+        setShowAddHabit(payload.showAddHabit);
+        setNewHabitName(payload.newHabitName);
+        setSelectedWCount(payload.selectedWCount);
+        setIsDropdownVisible(payload.isDropdownVisible);
+        setIsAddHabitVisible(payload.isAddHabitVisible);
+        setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+        setScoresData(payload.scoresData);
+        setCurrentWeek(payload.currentWeek);
+        setShowStartupPopup(payload.showStartupPopup);
+        setUserName(payload.userName);
+      }
+    }
+
+    // Add event listener for messages
+    window.addEventListener('message', handleMessage);
+
+    // Make sure to clean up event listeners when the component unmounts
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
 
   const updateScoresData = () => {
@@ -156,7 +224,7 @@ const App = () => {
   const handleResetWeek = () => {
     // Prompt the user for confirmation
     const confirmReset = window.confirm('Are you sure you want to reset this week?');
-    
+
     if (confirmReset) {
       setShowAddHabit(false);
       // Create a new gridData by resetting all days to 0 for the current habits
@@ -180,7 +248,7 @@ const App = () => {
     // Send message to background script
     // chrome.runtime.sendMessage({action: "nameSubmitted", name: name})
   };
-  
+
   //#endregion
 
   //#region Helper Functions

@@ -13,21 +13,36 @@
 // 1. Do not couple/nest event declarations
 
 // Let us see how many tabs are created 
-chrome.tabs.onCreated.addListener(function (tab) {
-    console.log('Tab created: ', tab.id);
-});
+// chrome.tabs.onCreated.addListener(function (tab) {
+//     console.log('Tab created: ', tab.id);
+// });
 
-// Username: listens to App.js, sends to content service worker 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // Check if request action regards submitted name
-    if (request.action === "nameSubmitted") {
-        const name = request.name;
+// Define state
+// let state = {};
 
-        // Send message regarding username submission to all open tabs
-        chrome.tabs.query({}, (tabs) => {
-            for(let i = 0; i < tabs.length; i++) {
-                chrome.tabs.sendMessage(tabs[i].id, { action: "updateName", name: name });
-            }
-        });
-    }
-});
+// Add listener for state change
+// chrome.storage.onChanged.addListener(function(changes, namespace) {
+//   if (namespace === 'sync' && changes.state) {
+//     chrome.tabs.query({}, function(tabs) {
+//       for (let tab of tabs) {
+//         chrome.tabs.sendMessage(tab.id, { state: changes.state.newValue });
+//         // console.log('FYI the state changed: ', tab.id);
+//       }
+//     });
+//   }
+// });
+
+// Add listener for state change
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (sender.action === "stateChanged") {
+//     // Update the state
+//     state = sender.state;
+
+//     // Broadcast the new state to all open tabs
+//     chrome.tabs.query({}, (tabs) => {
+//       for (let i = 0; i < tabs.length; i++) {
+//         chrome.tabs.sendMessage(tabs[i].id, { action: "updateState", state });
+//       }
+//     });
+//   }
+// });

@@ -18,8 +18,11 @@
   ],
   "author": "Keegan Borig",
   "permissions": [
-    "activeTab"
+    "tabs",
+    "activeTab",
+    "storage"
   ],
+
   "chrome_url_overrides": {
     "newtab": "index.html"
   }
