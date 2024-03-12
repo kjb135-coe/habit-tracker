@@ -22,6 +22,7 @@ const App = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('')
+  const defaultGridData = { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] }
   //#endregion
 
   // Communcation for background/content workers
@@ -57,19 +58,37 @@ const App = () => {
     userName,
   ]);
 
+  // Load state from chrome storage when component mounts
+  // useEffect(() => {
+  //   chrome.storage.sync.get(['gridData', 'showAddHabit', 'newHabitName', 'selectedWCount', 'isDropdownVisible', 'isAddHabitVisible', 'isDeleteDropdownVisible', 'scoresData', 'currentWeek', 'showStartupPopup', 'userName'], (result) => {
+  //     setGridData(result.gridData || defaultGridData);
+  //     setShowAddHabit(result.showAddHabit || false);
+  //     setNewHabitName(result.newHabitName || '');
+  //     setSelectedWCount(result.selectedWCount || 1);
+  //     setIsDropdownVisible(result.isDropdownVisible || false);
+  //     setIsAddHabitVisible(result.isAddHabitVisible || false);
+  //     setIsDeleteDropdownVisible(result.isDeleteDropdownVisible || false);
+  //     setScoresData(result.scoresData || []);
+  //     setCurrentWeek(result.currentWeek || 0);
+  //     setShowStartupPopup(result.showStartupPopup || true);
+  //     setUserName(result.userName || '');
+  //   });
+  //   console.log('State loaded from storage');
+  // }, []);
+
   useEffect(() => {
     function handleMessage(event) {
       // Only trust messages from the same frame
       if (event.source !== window) return;
-  
+
       const message = event.data;
-  
+
       // Make sure the message has the correct format
       if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
         const payload = message.payload;
-  
+
         // Check the payload type
-        if (payload.type === 'NEW_TAB_CREATED') {
+        if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
           // A new tab was created, update the state
           setGridData(payload.gridData);
           setShowAddHabit(payload.showAddHabit);
@@ -82,7 +101,7 @@ const App = () => {
           setCurrentWeek(payload.currentWeek);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
-        } else {
+        } else if(payload) {
           // Handle other messages
           setGridData(payload.gridData);
           setShowAddHabit(payload.showAddHabit);
@@ -98,10 +117,10 @@ const App = () => {
         }
       }
     }
-  
+
     // Add event listener for messages
     window.addEventListener('message', handleMessage);
-  
+
     // Make sure to clean up event listeners when the component unmounts
     return () => {
       window.removeEventListener('message', handleMessage);

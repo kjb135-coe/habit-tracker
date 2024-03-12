@@ -20,7 +20,8 @@
   "permissions": [
     "tabs",
     "activeTab",
-    "storage"
+    "storage",
+    "webNavigation"
   ],
 
   "chrome_url_overrides": {

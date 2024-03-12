@@ -47,14 +47,13 @@
 //   }
 // });
 
-chrome.tabs.onCreated.addListener(function(tab) {
+chrome.tabs.onCreated.addListener(function (tab) {
   // A new tab was created, do something...
   // Get the state from storage
-  chrome.storage.sync.get(['state'], function(result) {
+  chrome.storage.sync.get(['state'], function (result) {
     // Listen for when the tab is updated
-    chrome.tabs.onUpdated.addListener(function listener (tabId, info) {
+    chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
       if (info.status === 'complete' && tabId === tab.id) {
-        console.log('Tab reloaded');
         // The new tab is fully loaded, send the message
         chrome.tabs.sendMessage(tab.id, { type: 'NEW_TAB_CREATED', payload: { tabId: tab.id, state: result.state } });
         // Remove this listener
@@ -62,4 +61,21 @@ chrome.tabs.onCreated.addListener(function(tab) {
       }
     });
   });
+});
+
+chrome.webNavigation.onCommitted.addListener(function (details) {
+  if (details.transitionType === 'reload' || details.transitionType === 'auto_subframe') {
+    // Page is being reloaded or refreshed, handle accordingly
+    chrome.storage.sync.get(['state'], function (result) {
+      // Listen for when the tab is updated
+      chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+        if (info.status === 'complete' && tabId === details.tabId) {
+          // The new tab is fully loaded, send the message
+          chrome.tabs.sendMessage(details.tabId, { type: 'PAGE_REFRESH_DETECTED', payload: { tabId: details.tabId, state: result.state } });
+          // Remove this listener
+          chrome.tabs.onUpdated.removeListener(listener);
+        }
+      });
+    });
+  }
 });
