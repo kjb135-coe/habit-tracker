@@ -142,30 +142,6 @@ const App = () => {
     setIsAddHabitVisible(false);
   };
 
-  const handleSubmitScore = () => {
-    if (window.confirm('Are you sure you want to submit your score for this week?')) {
-      // Store the score for the current week
-      const newScoresData = [...scoresData];
-      const currentDate = new Date();
-      const daysUntilMonday = (currentDate.getDay() + 6) % 7;
-      const weekStartDate = new Date(currentDate);
-      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday - currentWeek * 7);
-      const weekEndDate = new Date(weekStartDate);
-      weekEndDate.setDate(weekStartDate.getDate() + 6);
-
-      const weekLabel = `${weekStartDate.toLocaleDateString('en-US', {
-        month: 'numeric',
-        day: 'numeric',
-      })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-
-      newScoresData.push({ week: weekLabel, score: calculateScore() });
-      setScoresData(newScoresData);
-
-      // Increment the current week
-      setCurrentWeek(currentWeek + 1);
-    }
-  };
-
   const handleAddHabitClick = () => {
     setIsDropdownVisible(!isDropdownVisible);
     if (isDropdownVisible) setShowAddHabit(true);
@@ -361,7 +337,6 @@ const App = () => {
         </button>
         {showAddHabit && (
           <div className="Dropdown">
-            <button onClick={handleSubmitScore}>Submit Score</button>
             <button onClick={toggleAddHabit}>Add Habit</button>
             <button className="DeleteButton" onClick={handleDeleteHabitClick}>
               Delete Habit
@@ -452,7 +427,7 @@ const App = () => {
             <button onClick={handleAddNewHabit}>Add</button>
           </div>
         )}
-        <p>&copy; 2023 Trackr v1.0.0</p>
+        <p>&copy; 2024 Trackr v1.0.0</p>
         {/* <LineChart /> */}
       </div>
     </div>

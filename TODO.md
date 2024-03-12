@@ -1,5 +1,5 @@
 - Add feature that shows a line/bar graph inspired by Strava to show points over time
-- Add "Submit Score" button
+- Delete "Submit Score" button
 - Add "Rotating Background" feature which changes the background image daily
 - Add Startup features:
     - Request first name --> "____'s Trackr"
