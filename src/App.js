@@ -7,7 +7,7 @@ import StartupPopup from './StartupPopup';
 
 const App = () => {
 
-  //#region variables
+  //#region Variables
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
@@ -22,9 +22,9 @@ const App = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('')
-  const defaultGridData = { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] }
   //#endregion
 
+  //#region Hooks
   // Communcation for background/content workers
   // Trigerred whenever any of the states listed are changed
   useEffect(() => {
@@ -58,24 +58,7 @@ const App = () => {
     userName,
   ]);
 
-  // Load state from chrome storage when component mounts
-  // useEffect(() => {
-  //   chrome.storage.sync.get(['gridData', 'showAddHabit', 'newHabitName', 'selectedWCount', 'isDropdownVisible', 'isAddHabitVisible', 'isDeleteDropdownVisible', 'scoresData', 'currentWeek', 'showStartupPopup', 'userName'], (result) => {
-  //     setGridData(result.gridData || defaultGridData);
-  //     setShowAddHabit(result.showAddHabit || false);
-  //     setNewHabitName(result.newHabitName || '');
-  //     setSelectedWCount(result.selectedWCount || 1);
-  //     setIsDropdownVisible(result.isDropdownVisible || false);
-  //     setIsAddHabitVisible(result.isAddHabitVisible || false);
-  //     setIsDeleteDropdownVisible(result.isDeleteDropdownVisible || false);
-  //     setScoresData(result.scoresData || []);
-  //     setCurrentWeek(result.currentWeek || 0);
-  //     setShowStartupPopup(result.showStartupPopup || true);
-  //     setUserName(result.userName || '');
-  //   });
-  //   console.log('State loaded from storage');
-  // }, []);
-
+  // Listen for messages from the content script
   useEffect(() => {
     function handleMessage(event) {
       // Only trust messages from the same frame
@@ -101,7 +84,7 @@ const App = () => {
           setCurrentWeek(payload.currentWeek);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
-        } else if(payload) {
+        } else if (payload) {
           // Handle other messages
           setGridData(payload.gridData);
           setShowAddHabit(payload.showAddHabit);
@@ -126,28 +109,7 @@ const App = () => {
       window.removeEventListener('message', handleMessage);
     };
   }, []);
-
-
-  const updateScoresData = () => {
-    const newScoresData = [];
-
-    gridData.forEach((habit) => {
-      const habitScore = habit.days.reduce((acc, value) => {
-        if (value >= 1 && value <= 3) {
-          acc += value;
-        }
-        return acc;
-      }, 0);
-
-      newScoresData.push({
-        habit: habit.habit,
-        scores: habit.days,
-        totalScore: habitScore,
-      });
-    });
-
-    setScoresData([...newScoresData]);
-  };
+  //#endregion
 
   //#region Handlers
   // Click event handler for each cell
@@ -290,6 +252,27 @@ const App = () => {
   //#endregion
 
   //#region Helper Functions
+  const updateScoresData = () => {
+    const newScoresData = [];
+
+    gridData.forEach((habit) => {
+      const habitScore = habit.days.reduce((acc, value) => {
+        if (value >= 1 && value <= 3) {
+          acc += value;
+        }
+        return acc;
+      }, 0);
+
+      newScoresData.push({
+        habit: habit.habit,
+        scores: habit.days,
+        totalScore: habitScore,
+      });
+    });
+
+    setScoresData([...newScoresData]);
+  };
+
   const calculateScore = () => {
     let score = 0;
     gridData.forEach((habit) => {

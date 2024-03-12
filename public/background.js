@@ -12,41 +12,7 @@
 // TIPS
 // 1. Do not couple/nest event declarations
 
-// Let us see how many tabs are created 
-// chrome.tabs.onCreated.addListener(function (tab) {
-//     console.log('Tab created: ', tab.id);
-// });
-
-// Define state
-// let state = {};
-
-// Add listener for state change
-// chrome.storage.onChanged.addListener(function(changes, namespace) {
-//   if (namespace === 'sync' && changes.state) {
-//     chrome.tabs.query({}, function(tabs) {
-//       for (let tab of tabs) {
-//         chrome.tabs.sendMessage(tab.id, { state: changes.state.newValue });
-//         // console.log('FYI the state changed: ', tab.id);
-//       }
-//     });
-//   }
-// });
-
-// Add listener for state change
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (sender.action === "stateChanged") {
-//     // Update the state
-//     state = sender.state;
-
-//     // Broadcast the new state to all open tabs
-//     chrome.tabs.query({}, (tabs) => {
-//       for (let i = 0; i < tabs.length; i++) {
-//         chrome.tabs.sendMessage(tabs[i].id, { action: "updateState", state });
-//       }
-//     });
-//   }
-// });
-
+// New tab and change listener
 chrome.tabs.onCreated.addListener(function (tab) {
   // A new tab was created, do something...
   // Get the state from storage
@@ -63,6 +29,7 @@ chrome.tabs.onCreated.addListener(function (tab) {
   });
 });
 
+// Reload/refresh and change listener
 chrome.webNavigation.onCommitted.addListener(function (details) {
   if (details.transitionType === 'reload' || details.transitionType === 'auto_subframe') {
     // Page is being reloaded or refreshed, handle accordingly
