@@ -61,28 +61,47 @@ const App = () => {
     function handleMessage(event) {
       // Only trust messages from the same frame
       if (event.source !== window) return;
-
-      // Only process messages that we sent
-      // Set states if each variable
-      if (event.data.type && event.data.type === 'FROM_CONTENT_SCRIPT') {
-        const payload = event.data.payload;
-        setGridData(payload.gridData);
-        setShowAddHabit(payload.showAddHabit);
-        setNewHabitName(payload.newHabitName);
-        setSelectedWCount(payload.selectedWCount);
-        setIsDropdownVisible(payload.isDropdownVisible);
-        setIsAddHabitVisible(payload.isAddHabitVisible);
-        setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-        setScoresData(payload.scoresData);
-        setCurrentWeek(payload.currentWeek);
-        setShowStartupPopup(payload.showStartupPopup);
-        setUserName(payload.userName);
+  
+      const message = event.data;
+  
+      // Make sure the message has the correct format
+      if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
+        const payload = message.payload;
+  
+        // Check the payload type
+        if (payload.type === 'NEW_TAB_CREATED') {
+          // A new tab was created, update the state
+          setGridData(payload.gridData);
+          setShowAddHabit(payload.showAddHabit);
+          setNewHabitName(payload.newHabitName);
+          setSelectedWCount(payload.selectedWCount);
+          setIsDropdownVisible(payload.isDropdownVisible);
+          setIsAddHabitVisible(payload.isAddHabitVisible);
+          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+          setScoresData(payload.scoresData);
+          setCurrentWeek(payload.currentWeek);
+          setShowStartupPopup(payload.showStartupPopup);
+          setUserName(payload.userName);
+        } else {
+          // Handle other messages
+          setGridData(payload.gridData);
+          setShowAddHabit(payload.showAddHabit);
+          setNewHabitName(payload.newHabitName);
+          setSelectedWCount(payload.selectedWCount);
+          setIsDropdownVisible(payload.isDropdownVisible);
+          setIsAddHabitVisible(payload.isAddHabitVisible);
+          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+          setScoresData(payload.scoresData);
+          setCurrentWeek(payload.currentWeek);
+          setShowStartupPopup(payload.showStartupPopup);
+          setUserName(payload.userName);
+        }
       }
     }
-
+  
     // Add event listener for messages
     window.addEventListener('message', handleMessage);
-
+  
     // Make sure to clean up event listeners when the component unmounts
     return () => {
       window.removeEventListener('message', handleMessage);

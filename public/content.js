@@ -58,9 +58,17 @@
 // });
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-  console.log('Reached onChanged listener');
+  // console.log('Reached onChanged listener');
   if (namespace === 'sync' && changes.state) {
     // Send the new state to the window
     window.postMessage({ type: 'FROM_CONTENT_SCRIPT', payload: changes.state.newValue }, '*');
+  }
+});
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  if (message.type === 'NEW_TAB_CREATED') {
+    // Send the state to the window
+    // console.log('Reached onCreated listener');
+    window.postMessage({ type: 'FROM_CONTENT_SCRIPT', payload: message.payload.state }, '*');
   }
 });

@@ -46,3 +46,20 @@
 //     });
 //   }
 // });
+
+chrome.tabs.onCreated.addListener(function(tab) {
+  // A new tab was created, do something...
+  // Get the state from storage
+  chrome.storage.sync.get(['state'], function(result) {
+    // Listen for when the tab is updated
+    chrome.tabs.onUpdated.addListener(function listener (tabId, info) {
+      if (info.status === 'complete' && tabId === tab.id) {
+        console.log('Tab reloaded');
+        // The new tab is fully loaded, send the message
+        chrome.tabs.sendMessage(tab.id, { type: 'NEW_TAB_CREATED', payload: { tabId: tab.id, state: result.state } });
+        // Remove this listener
+        chrome.tabs.onUpdated.removeListener(listener);
+      }
+    });
+  });
+});
