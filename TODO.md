@@ -11,5 +11,7 @@
 ~~Delete "Submit Score" button~~
 - Google sign in?
 - Fix reset week bug
+- Fix max writes per minute quota
+    - change so that state is saved when tab 1 is switched to tab 2 and tab 2 is loaded from tab 1 when tab 2 is opened
 
 
