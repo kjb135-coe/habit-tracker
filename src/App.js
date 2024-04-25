@@ -27,23 +27,28 @@ const App = () => {
   //#region Hooks
   // Communcation for background/content workers
   // Trigerred whenever any of the states listed are changed
+  // Chrome only allows 120 requests per minute, so this is a workaround
   useEffect(() => {
-    // Store the state in memory using chrome.storage.sync
-    chrome.storage.sync.set({
-      state: {
-        gridData,
-        showAddHabit,
-        newHabitName,
-        selectedWCount,
-        isDropdownVisible,
-        isAddHabitVisible,
-        isDeleteDropdownVisible,
-        scoresData,
-        currentWeek,
-        showStartupPopup,
-        userName,
-      }
-    });
+    const interval = setInterval(() => {
+      // Store the state in memory using chrome.storage.sync
+      chrome.storage.sync.set({
+        state: {
+          gridData,
+          showAddHabit,
+          newHabitName,
+          selectedWCount,
+          isDropdownVisible,
+          isAddHabitVisible,
+          isDeleteDropdownVisible,
+          scoresData,
+          currentWeek,
+          showStartupPopup,
+          userName,
+        }
+      });
+    }, 660);
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(interval);
   }, [
     gridData,
     showAddHabit,

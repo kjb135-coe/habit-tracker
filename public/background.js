@@ -48,28 +48,25 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
   }
 });
 
-// Fires right before a web navigation is committed
-chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
-  // console.log('onBeforeNavigate');
-  // console.log(details);
-  // console.log('onBeforeNavigate');
+let currentTabId;
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+  console.log('activated');
+  if (currentTabId !== undefined) {
+    // The previously active tab is no longer active, save the state
+
+    // Wait for the tab to fully load before saving the state
+    setTimeout(function() {
+      chrome.storage.sync.get(['state'], function(result) {
+        // Save the state of the previous tab
+        let newState = {...result.state, [currentTabId]: {/* state of the tab */}};
+        chrome.storage.sync.set({state: newState}, function() {
+          console.log('State saved for tab ' + currentTabId);
+        });
+      });
+    }, 500);
+  }
+
+  // Update the current tab ID
+  currentTabId = activeInfo.tabId;
 });
-
-// let currentTabId;
-
-// chrome.tabs.onActivated.addListener(function(activeInfo) {
-//   console.log('activated');
-//   if (currentTabId !== undefined) {
-//     // The previously active tab is no longer active, save the state
-//     chrome.storage.sync.get(['state'], function(result) {
-//       // Save the state of the previous tab
-//       let newState = {...result.state, [currentTabId]: {/* state of the tab */}};
-//       chrome.storage.sync.set({state: newState}, function() {
-//         console.log('State saved for tab ' + currentTabId);
-//       });
-//     });
-//   }
-
-//   // Update the current tab ID
-//   currentTabId = activeInfo.tabId;
-// });
