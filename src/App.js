@@ -125,6 +125,8 @@ const App = () => {
 
     if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
       // Handle when selectedWCount is not defined or set to 'Enter Max Points'
+      if(selectedWCount === 'Enter Max Points') alert('enter max points.');
+      else alert('undefined.');
       alert('Please add a habit or select the max number of points for this habit.');
       return;
     }
@@ -213,6 +215,7 @@ const App = () => {
         return {
           habit: habit.habit,
           days: [0, 0, 0, 0, 0, 0, 0],
+          selectedWCount: habit.selectedWCount, // Set selectedWCount to 0
         };
       });
       setGridData(newGridData);
