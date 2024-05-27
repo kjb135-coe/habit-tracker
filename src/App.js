@@ -204,24 +204,6 @@ const App = () => {
     }
   };
 
-  const handleResetWeek = () => {
-    // Prompt the user for confirmation
-    const confirmReset = window.confirm('Are you sure you want to reset this week?');
-
-    if (confirmReset) {
-      setShowAddHabit(false);
-      // Create a new gridData by resetting all days to 0 for the current habits
-      const newGridData = gridData.map((habit) => {
-        return {
-          habit: habit.habit,
-          days: [0, 0, 0, 0, 0, 0, 0],
-          selectedWCount: habit.selectedWCount, // Set selectedWCount to 0
-        };
-      });
-      setGridData(newGridData);
-    }
-  };
-
   const handleNameSubmit = (name) => {
     // Set the user's name when it's submitted
     setUserName(name);
@@ -362,7 +344,6 @@ const App = () => {
                 ))}
               </div>
             )}
-            <button onClick={handleResetWeek}>Reset Week</button>
           </div>
         )}
       </div>
