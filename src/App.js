@@ -125,7 +125,7 @@ const App = () => {
 
     if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
       // Handle when selectedWCount is not defined or set to 'Enter Max Points'
-      if(selectedWCount === 'Enter Max Points') alert('enter max points.');
+      if (selectedWCount === 'Enter Max Points') alert('enter max points.');
       else alert('undefined.');
       alert('Please add a habit or select the max number of points for this habit.');
       return;
@@ -161,8 +161,8 @@ const App = () => {
       return;
     }
 
-    if (gridData.length >= 8) {
-      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 8 or less');
+    if (gridData.length >= 6) {
+      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 6 or less');
       setShowAddHabit(false);
       setIsAddHabitVisible(false);
       return;
@@ -266,6 +266,8 @@ const App = () => {
     return weekDates;
   };
 
+
+
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ scores }) => {
     const weeksToShow = 4; // Number of weeks to show
@@ -289,6 +291,19 @@ const App = () => {
       const score = scores.find((s) => s.week === week)?.score || 0;
 
       displayedScores.push({ week, score });
+
+      // Test: After 20 seconds, manually change the date to a week from the current day
+      setTimeout(() => {
+        const testDate = new Date();
+        testDate.setDate(testDate.getDate() + 7);
+
+        // Check if it's a new week
+        const lastWeekEndDate = new Date(displayedScores[displayedScores.length - 1].week.split(' - ')[1]);
+        if (testDate > lastWeekEndDate) {
+          console.log('It\'s a new week!');
+          // Add your logic for a new week here
+        }
+      }, 20000);
     }
 
 
