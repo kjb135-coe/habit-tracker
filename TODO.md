@@ -13,5 +13,7 @@
 ~~Fix reset week bug~~
 ~~Fix max writes per minute quota~~
     ~~change so that state is saved w.hen tab 1 is switched to tab 2 and tab 2 is loaded from tab 1 when tab 2 is opened~~
-
+- change max habits to 6
+- grid should clear and save score when week changes
+- account for different time zones
 
