@@ -7,6 +7,24 @@ import StartupPopup from './StartupPopup';
 
 const App = () => {
 
+  const [startDate, setStartDate] = useState(new Date());
+
+  const getCurrentWeekDates = (startDate) => {
+    const currentDay = startDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+  
+    // Calculate the number of days to subtract to get to the start of the week (Monday)
+    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
+  
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() - daysUntilMonday + i);
+      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
+    }
+  
+    return weekDates;
+  };
+
   //#region Variables
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
@@ -19,7 +37,7 @@ const App = () => {
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [scoresData, setScoresData] = useState([]);
-  const [currentWeek, setCurrentWeek] = useState(0);
+  const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('')
   //#endregion
@@ -41,7 +59,7 @@ const App = () => {
           isAddHabitVisible,
           isDeleteDropdownVisible,
           scoresData,
-          currentWeek,
+          weekDates,
           showStartupPopup,
           userName,
         }
@@ -58,7 +76,7 @@ const App = () => {
     isAddHabitVisible,
     isDeleteDropdownVisible,
     scoresData,
-    currentWeek,
+    weekDates,
     showStartupPopup,
     userName,
   ]);
@@ -86,7 +104,7 @@ const App = () => {
           setIsAddHabitVisible(payload.isAddHabitVisible);
           setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
           setScoresData(payload.scoresData);
-          setCurrentWeek(payload.currentWeek);
+          setWeekDates(payload.weekDates);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
         } else if (payload) {
@@ -99,7 +117,7 @@ const App = () => {
           setIsAddHabitVisible(payload.isAddHabitVisible);
           setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
           setScoresData(payload.scoresData);
-          setCurrentWeek(payload.currentWeek);
+          setWeekDates(payload.weekDates);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
         }
@@ -113,6 +131,20 @@ const App = () => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
+  }, []);
+
+  // Update week dates to get next week every 15 seconds for testing
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStartDate(prevDate => {
+        const newDate = new Date(prevDate);
+        newDate.setDate(prevDate.getDate() + 7);
+        setWeekDates(getCurrentWeekDates(newDate));
+        return newDate;
+      });
+    }, 15000);
+  
+    return () => clearInterval(interval);
   }, []);
   //#endregion
 
@@ -249,27 +281,8 @@ const App = () => {
     return score;
   };
 
-  const getCurrentWeekDates = () => {
-    const currentDate = new Date();
-    const currentDay = currentDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-
-    // Calculate the number of days to subtract to get to the start of the week (Monday)
-    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() - daysUntilMonday + i);
-      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
-    }
-
-    return weekDates;
-  };
-
-
-
   // Component to display the submitted scores
-  const SubmittedScoresTable = ({ scores }) => {
+  const SubmittedScoresTable = ({ scores, startDate }) => {
     const weeksToShow = 4; // Number of weeks to show
     const displayedScores = [];
 
@@ -278,34 +291,24 @@ const App = () => {
 
     // Create an array of week date strings for the last four weeks
     for (let i = 0; i < weeksToShow; i++) {
-      const currentDate = new Date();
-      const daysUntilMonday = (currentDate.getDay() + 6) % 7; // Calculate days until the previous Monday
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() - i * 7);
+      const currentDay = currentDate.getDay();
+      const daysUntilMonday = (currentDay + 6) % 7;
       const weekStartDate = new Date(currentDate);
-      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday - i * 7);
+      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday);
       const weekEndDate = new Date(weekStartDate);
       weekEndDate.setDate(weekStartDate.getDate() + 6);
-
+  
       const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-
+  
       // Find the score for this week, or default to 0
       const score = scores.find((s) => s.week === week)?.score || 0;
-
+  
       displayedScores.push({ week, score });
-
-      // Test: After 20 seconds, manually change the date to a week from the current day
-      setTimeout(() => {
-        const testDate = new Date();
-        testDate.setDate(testDate.getDate() + 7);
-
-        // Check if it's a new week
-        const lastWeekEndDate = new Date(displayedScores[displayedScores.length - 1].week.split(' - ')[1]);
-        if (testDate > lastWeekEndDate) {
-          console.log('It\'s a new week!');
-          // Add your logic for a new week here
-        }
-      }, 20000);
     }
 
+    console.log("I've been called!");
 
     return (
       <div className="SubmittedScores">
@@ -370,7 +373,7 @@ const App = () => {
           <thead>
             <tr>
               <th></th>
-              {getCurrentWeekDates().map((date, dayIndex) => (
+              {weekDates.map((date, dayIndex) => (
                 <th key={dayIndex}>{date}</th>
               ))}
             </tr>
@@ -410,7 +413,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={scoresData} />
+        <SubmittedScoresTable scores={scoresData} startDate={startDate}/>
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
