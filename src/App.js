@@ -11,17 +11,17 @@ const App = () => {
 
   const getCurrentWeekDates = (startDate) => {
     const currentDay = startDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-  
+
     // Calculate the number of days to subtract to get to the start of the week (Monday)
     const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-  
+
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() - daysUntilMonday + i);
       weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
     }
-  
+
     return weekDates;
   };
 
@@ -139,13 +139,20 @@ const App = () => {
       setStartDate(prevDate => {
         const newDate = new Date(prevDate);
         newDate.setDate(prevDate.getDate() + 7);
+
+        // Calculate and add the current week's score to scoresData
+        // const currentWeekScore = calculateScore();
+        // const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
+        // const newScoresData = [{ week: currentWeek, score: currentWeekScore }, ...scoresData];
+
+        // setScoresData(newScoresData);
         setWeekDates(getCurrentWeekDates(newDate));
+        clearGridData(gridData); // Clear the grid data for the new week
         return newDate;
       });
     }, 15000);
-  
     return () => clearInterval(interval);
-  }, []);
+  }, [gridData]);
   //#endregion
 
   //#region Handlers
@@ -281,6 +288,17 @@ const App = () => {
     return score;
   };
 
+  // Function to clear the grid data for new week
+  const clearGridData = (gridData) => {
+    const clearedGridData = gridData.map(habit => ({
+      ...habit,
+      days: new Array(7).fill(0)
+    }));
+
+    setGridData(clearedGridData);
+  };
+  
+
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ scores, startDate }) => {
     const weeksToShow = 4; // Number of weeks to show
@@ -299,12 +317,12 @@ const App = () => {
       weekStartDate.setDate(currentDate.getDate() - daysUntilMonday);
       const weekEndDate = new Date(weekStartDate);
       weekEndDate.setDate(weekStartDate.getDate() + 6);
-  
+
       const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-  
+
       // Find the score for this week, or default to 0
       const score = scores.find((s) => s.week === week)?.score || 0;
-  
+
       displayedScores.push({ week, score });
     }
 
@@ -413,7 +431,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={scoresData} startDate={startDate}/>
+        <SubmittedScoresTable scores={scoresData} startDate={startDate} />
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
