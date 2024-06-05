@@ -141,18 +141,18 @@ const App = () => {
         newDate.setDate(prevDate.getDate() + 7);
 
         // Calculate and add the current week's score to scoresData
-        // const currentWeekScore = calculateScore();
-        // const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
-        // const newScoresData = [{ week: currentWeek, score: currentWeekScore }, ...scoresData];
+        const currentWeekScore = calculateScore();
+        const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
+        const newScoresData = [{ week: currentWeek, score: currentWeekScore }, ...scoresData];
 
-        // setScoresData(newScoresData);
+        setScoresData(newScoresData);
         setWeekDates(getCurrentWeekDates(newDate));
         clearGridData(gridData); // Clear the grid data for the new week
         return newDate;
       });
     }, 15000);
     return () => clearInterval(interval);
-  }, [gridData]);
+  }, [gridData, weekDates, scoresData]);
   //#endregion
 
   //#region Handlers
@@ -304,8 +304,8 @@ const App = () => {
     const weeksToShow = 4; // Number of weeks to show
     const displayedScores = [];
 
-    // Calculate the score for the first week
-    const firstWeekScore = calculateScore();
+    console.log("scores: ", scores);
+    const currentWeekScore = calculateScore();
 
     // Create an array of week date strings for the last four weeks
     for (let i = 0; i < weeksToShow; i++) {
@@ -321,12 +321,15 @@ const App = () => {
       const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
 
       // Find the score for this week, or default to 0
-      const score = scores.find((s) => s.week === week)?.score || 0;
+      const score = scores.find((s) => s.week === week)?.totalScore || 0;
+      //console.log(score);
 
-      displayedScores.push({ week, score });
+      if(i == 0) displayedScores.push({ week, currentWeekScore });
+      else displayedScores.push({ week, score });
     }
 
-    console.log("I've been called!");
+    console.log("displayedScores: ", displayedScores);  
+
 
     return (
       <div className="SubmittedScores">
@@ -341,7 +344,7 @@ const App = () => {
             {displayedScores.map((score, index) => (
               <tr key={index}>
                 <td>{score.week}</td>
-                <td>{index === 0 ? firstWeekScore : score.score}</td>
+                <td>{score.score}</td>
               </tr>
             ))}
           </tbody>
