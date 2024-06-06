@@ -26,9 +26,29 @@ const App = () => {
   };
 
   //#region Variables
+  const currentDate = new Date(startDate);
+  const weekDate1 = calculateWeekDate(currentDate, 0);
+  const weekDate2 = calculateWeekDate(currentDate, 1);
+  const weekDate3 = calculateWeekDate(currentDate, 2);
+  const weekDate4 = calculateWeekDate(currentDate, 3);
+
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
+
+  function calculateWeekDate(startDate, i) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() - i * 7);
+    const currentDay = currentDate.getDay();
+    const daysUntilMonday = (currentDay + 6) % 7;
+    const weekStartDate = new Date(currentDate);
+    weekStartDate.setDate(currentDate.getDate() - daysUntilMonday);
+    const weekEndDate = new Date(weekStartDate);
+    weekEndDate.setDate(weekStartDate.getDate() + 6);
+
+    const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
+    return week;
+  }
 
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
@@ -40,11 +60,18 @@ const App = () => {
   const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('')
+  const [displayedScores, setDisplayedScores] = useState([
+    [weekDate1, 0],
+    [weekDate2, 0],
+    [weekDate3, 0],
+    [weekDate4, 0],
+  ]);
+  const [weeklyScores, setWeeklyScores] = useState([0, 0, 0, 0]);
   //#endregion
 
   //#region Hooks
   // Communcation for background/content workers
-  // Trigerred whenever any of the states listed are changed
+  // Triggerred whenever any of the states listed are changed
   // Chrome only allows 120 requests per minute, so this is a workaround
   useEffect(() => {
     const interval = setInterval(() => {
@@ -141,9 +168,18 @@ const App = () => {
         newDate.setDate(prevDate.getDate() + 7);
 
         // Calculate and add the current week's score to scoresData
-        const currentWeekScore = calculateScore();
+        // const currentWeekScore = calculateScore();
         const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
-        const newScoresData = [{ week: currentWeek, score: currentWeekScore }, ...scoresData];
+        const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
+
+        const newDisplayedScores = [
+          [ calculateWeekDate(newDate, 0), 0 ],
+          [ calculateWeekDate(newDate, 1), weeklyScores[0] || 0 ],
+          [ calculateWeekDate(newDate, 2), weeklyScores[1] || 0 ],
+          [ calculateWeekDate(newDate, 3), weeklyScores[2] || 0 ],
+        ];
+
+        setDisplayedScores(newDisplayedScores);
 
         setScoresData(newScoresData);
         setWeekDates(getCurrentWeekDates(newDate));
@@ -152,7 +188,7 @@ const App = () => {
       });
     }, 15000);
     return () => clearInterval(interval);
-  }, [gridData, weekDates, scoresData]);
+  }, [gridData, weekDates, scoresData, weeklyScores]);
   //#endregion
 
   //#region Handlers
@@ -181,6 +217,17 @@ const App = () => {
       // Reset to blank if it exceeds selectedWCount
       newGridData[habitIndex].days[dayIndex] = 0;
     }
+
+
+    const newWeeklyScores = [calculateScore(), weeklyScores[1], weeklyScores[2], weeklyScores[3]];
+    setWeeklyScores(newWeeklyScores);
+    console.log(newWeeklyScores);
+    setDisplayedScores([
+      [weekDate1, weeklyScores[0]],
+      [weekDate2, weeklyScores[1]],
+      [weekDate3, weeklyScores[2]],
+      [weekDate4, weeklyScores[3]],
+    ]);
 
     setGridData(newGridData);
     updateScoresData();
@@ -249,9 +296,6 @@ const App = () => {
 
     // Close the startup popup
     setShowStartupPopup(false);
-
-    // Send message to background script
-    // chrome.runtime.sendMessage({action: "nameSubmitted", name: name})
   };
 
   //#endregion
@@ -267,6 +311,7 @@ const App = () => {
         }
         return acc;
       }, 0);
+
 
       newScoresData.push({
         habit: habit.habit,
@@ -297,39 +342,12 @@ const App = () => {
 
     setGridData(clearedGridData);
   };
-  
+
 
   // Component to display the submitted scores
-  const SubmittedScoresTable = ({ scores, startDate }) => {
-    const weeksToShow = 4; // Number of weeks to show
-    const displayedScores = [];
+  const SubmittedScoresTable = ({ displayedScores }) => {
 
-    console.log("scores: ", scores);
-    const currentWeekScore = calculateScore();
-
-    // Create an array of week date strings for the last four weeks
-    for (let i = 0; i < weeksToShow; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() - i * 7);
-      const currentDay = currentDate.getDay();
-      const daysUntilMonday = (currentDay + 6) % 7;
-      const weekStartDate = new Date(currentDate);
-      weekStartDate.setDate(currentDate.getDate() - daysUntilMonday);
-      const weekEndDate = new Date(weekStartDate);
-      weekEndDate.setDate(weekStartDate.getDate() + 6);
-
-      const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-
-      // Find the score for this week, or default to 0
-      const score = scores.find((s) => s.week === week)?.totalScore || 0;
-      //console.log(score);
-
-      if(i == 0) displayedScores.push({ week, currentWeekScore });
-      else displayedScores.push({ week, score });
-    }
-
-    console.log("displayedScores: ", displayedScores);  
-
+    console.log(displayedScores);
 
     return (
       <div className="SubmittedScores">
@@ -341,12 +359,22 @@ const App = () => {
             </tr>
           </thead>
           <tbody>
-            {displayedScores.map((score, index) => (
-              <tr key={index}>
-                <td>{score.week}</td>
-                <td>{score.score}</td>
-              </tr>
-            ))}
+            <tr>
+              <td>{displayedScores[0][0]}</td>
+              <td>{displayedScores[0][1]}</td>
+            </tr>
+            <tr>
+              <td>{displayedScores[1][0]}</td>
+              <td>{displayedScores[1][1]}</td>
+            </tr>
+            <tr>
+              <td>{displayedScores[2][0]}</td>
+              <td>{displayedScores[2][1]}</td>
+            </tr>
+            <tr>
+              <td>{displayedScores[3][0]}</td>
+              <td>{displayedScores[3][1]}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -434,7 +462,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={scoresData} startDate={startDate} />
+        <SubmittedScoresTable scores={scoresData} startDate={startDate} displayedScores={displayedScores} />
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
