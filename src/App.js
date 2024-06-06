@@ -27,10 +27,13 @@ const App = () => {
 
   //#region Variables
   const currentDate = new Date(startDate);
-  const weekDate1 = calculateWeekDate(currentDate, 0);
-  const weekDate2 = calculateWeekDate(currentDate, 1);
-  const weekDate3 = calculateWeekDate(currentDate, 2);
-  const weekDate4 = calculateWeekDate(currentDate, 3);
+  const [weekDatesTable, setWeekDatesTable] = useState([
+    calculateWeekDate(currentDate, 0),
+    calculateWeekDate(currentDate, 1),
+    calculateWeekDate(currentDate, 2),
+    calculateWeekDate(currentDate, 3)
+  ]);
+
 
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
@@ -59,14 +62,15 @@ const App = () => {
   const [scoresData, setScoresData] = useState([]);
   const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
   const [showStartupPopup, setShowStartupPopup] = useState(true);
-  const [userName, setUserName] = useState('')
+  const [userName, setUserName] = useState('');
   const [displayedScores, setDisplayedScores] = useState([
-    [weekDate1, 0],
-    [weekDate2, 0],
-    [weekDate3, 0],
-    [weekDate4, 0],
+    [weekDatesTable[0], 0],
+    [weekDatesTable[1], 0],
+    [weekDatesTable[2], 0],
+    [weekDatesTable[3], 0]
   ]);
-  const [weeklyScores, setWeeklyScores] = useState([0, 0, 0, 0]);
+
+
   //#endregion
 
   //#region Hooks
@@ -172,14 +176,19 @@ const App = () => {
         const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
         const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
 
-        const newDisplayedScores = [
-          [ calculateWeekDate(newDate, 0), 0 ],
-          [ calculateWeekDate(newDate, 1), weeklyScores[0] || 0 ],
-          [ calculateWeekDate(newDate, 2), weeklyScores[1] || 0 ],
-          [ calculateWeekDate(newDate, 3), weeklyScores[2] || 0 ],
-        ];
+        setWeekDatesTable([
+          calculateWeekDate(newDate, 0),
+          calculateWeekDate(newDate, 1),
+          calculateWeekDate(newDate, 2),
+          calculateWeekDate(newDate, 3)
+        ]);
 
-        setDisplayedScores(newDisplayedScores);
+        setDisplayedScores([
+          [weekDatesTable[0], 0],
+          [weekDatesTable[1], displayedScores[0][1]],
+          [weekDatesTable[2], displayedScores[1][1]],
+          [weekDatesTable[3], displayedScores[2][1]],
+        ]);
 
         setScoresData(newScoresData);
         setWeekDates(getCurrentWeekDates(newDate));
@@ -188,7 +197,7 @@ const App = () => {
       });
     }, 15000);
     return () => clearInterval(interval);
-  }, [gridData, weekDates, scoresData, weeklyScores]);
+  }, [gridData, weekDates, scoresData, displayedScores]);
   //#endregion
 
   //#region Handlers
@@ -218,15 +227,11 @@ const App = () => {
       newGridData[habitIndex].days[dayIndex] = 0;
     }
 
-
-    const newWeeklyScores = [calculateScore(), weeklyScores[1], weeklyScores[2], weeklyScores[3]];
-    setWeeklyScores(newWeeklyScores);
-    console.log(newWeeklyScores);
     setDisplayedScores([
-      [weekDate1, weeklyScores[0]],
-      [weekDate2, weeklyScores[1]],
-      [weekDate3, weeklyScores[2]],
-      [weekDate4, weeklyScores[3]],
+      [weekDatesTable[0], calculateScore()],
+      [weekDatesTable[1], displayedScores[1][1]],
+      [weekDatesTable[2], displayedScores[2][1]],
+      [weekDatesTable[3], displayedScores[3][1]],
     ]);
 
     setGridData(newGridData);
@@ -347,7 +352,7 @@ const App = () => {
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ displayedScores }) => {
 
-    console.log(displayedScores);
+    // console.log(displayedScores);
 
     return (
       <div className="SubmittedScores">
@@ -462,7 +467,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable scores={scoresData} startDate={startDate} displayedScores={displayedScores} />
+        <SubmittedScoresTable displayedScores={displayedScores} />
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
