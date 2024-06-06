@@ -350,7 +350,7 @@ const App = () => {
 
 
   // Component to display the submitted scores
-  const SubmittedScoresTable = ({ displayedScores }) => {
+  const SubmittedScoresTable = ({ displayedScores, weekDatesTable }) => {
 
     // console.log(displayedScores);
 
@@ -365,19 +365,19 @@ const App = () => {
           </thead>
           <tbody>
             <tr>
-              <td>{displayedScores[0][0]}</td>
+              <td>{weekDatesTable[0]}</td>
               <td>{displayedScores[0][1]}</td>
             </tr>
             <tr>
-              <td>{displayedScores[1][0]}</td>
+              <td>{weekDatesTable[1]}</td>
               <td>{displayedScores[1][1]}</td>
             </tr>
             <tr>
-              <td>{displayedScores[2][0]}</td>
+              <td>{weekDatesTable[2]}</td>
               <td>{displayedScores[2][1]}</td>
             </tr>
             <tr>
-              <td>{displayedScores[3][0]}</td>
+              <td>{weekDatesTable[3]}</td>
               <td>{displayedScores[3][1]}</td>
             </tr>
           </tbody>
@@ -467,7 +467,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable displayedScores={displayedScores} />
+        <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable}/>
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input
