@@ -9,23 +9,34 @@ const App = () => {
 
   const [startDate, setStartDate] = useState(new Date());
 
+  // Function to get the Monday of the current week
+  const getMonday = (date) => {
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    return new Date(date.setDate(diff));
+  };
+
   const getCurrentWeekDates = (startDate) => {
-    const currentDay = startDate.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-
-    // Calculate the number of days to subtract to get to the start of the week (Monday)
-    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
-
+    const monday = getMonday(startDate);
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() - daysUntilMonday + i);
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
       weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
     }
-
     return weekDates;
   };
 
   //#region Variables
+  const calculateWeekDate = (startDate, i) => {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() - i * 7);
+    const weekStart = getMonday(currentDate);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    return `${weekStart.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
+  };
+
   const currentDate = new Date(startDate);
   const [weekDatesTable, setWeekDatesTable] = useState([
     calculateWeekDate(currentDate, 0),
@@ -34,24 +45,9 @@ const App = () => {
     calculateWeekDate(currentDate, 3)
   ]);
 
-
   const [gridData, setGridData] = useState([
     { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
-
-  function calculateWeekDate(startDate, i) {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() - i * 7);
-    const currentDay = currentDate.getDay();
-    const daysUntilMonday = (currentDay + 6) % 7;
-    const weekStartDate = new Date(currentDate);
-    weekStartDate.setDate(currentDate.getDate() - daysUntilMonday);
-    const weekEndDate = new Date(weekStartDate);
-    weekEndDate.setDate(weekStartDate.getDate() + 6);
-
-    const week = `${weekStartDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEndDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-    return week;
-  }
 
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
@@ -69,7 +65,7 @@ const App = () => {
     [weekDatesTable[2], 0],
     [weekDatesTable[3], 0]
   ]);
-
+  const [prevDay, setPrevDay] = useState(new Date().getDay());
 
   //#endregion
 
@@ -164,40 +160,43 @@ const App = () => {
     };
   }, []);
 
-  // Update week dates to get next week every 15 seconds for testing
+  // Check for new week
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStartDate(prevDate => {
-        const newDate = new Date(prevDate);
-        newDate.setDate(prevDate.getDate() + 7);
-
-        // Calculate and add the current week's score to scoresData
-        // const currentWeekScore = calculateScore();
-        const currentWeek = weekDates[0]; // Use the first day of the week as the week's identifier
-        const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
-
-        setWeekDatesTable([
-          calculateWeekDate(newDate, 0),
-          calculateWeekDate(newDate, 1),
-          calculateWeekDate(newDate, 2),
-          calculateWeekDate(newDate, 3)
-        ]);
-
-        setDisplayedScores([
-          [weekDatesTable[0], 0],
-          [weekDatesTable[1], displayedScores[0][1]],
-          [weekDatesTable[2], displayedScores[1][1]],
-          [weekDatesTable[3], displayedScores[2][1]],
-        ]);
-
-        setScoresData(newScoresData);
-        setWeekDates(getCurrentWeekDates(newDate));
-        clearGridData(gridData); // Clear the grid data for the new week
-        return newDate;
-      });
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [gridData, weekDates, scoresData, displayedScores]);
+    const now = new Date();
+    const currentDay = now.getDay();
+  
+    // Check if today is Monday and the previous day was Sunday
+    if (currentDay === 1 && prevDay === 0) {
+      const newDate = new Date(startDate);
+      newDate.setDate(startDate.getDate() + 7);
+  
+      const currentWeek = weekDates[0];
+      const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
+  
+      setWeekDatesTable([
+        calculateWeekDate(newDate, 0),
+        calculateWeekDate(newDate, 1),
+        calculateWeekDate(newDate, 2),
+        calculateWeekDate(newDate, 3),
+      ]);
+  
+      setDisplayedScores([
+        [weekDatesTable[0], 0],
+        [weekDatesTable[1], displayedScores[1][1]],
+        [weekDatesTable[2], displayedScores[2][1]],
+        [weekDatesTable[3], displayedScores[3][1]],
+      ]);
+  
+      setScoresData(newScoresData);
+      setWeekDates(getCurrentWeekDates(newDate));
+      clearGridData(gridData);
+      setStartDate(newDate);
+    }
+  
+    // Update the previous day to current day for the next check
+    setPrevDay(currentDay);
+  }, [prevDay, startDate, weekDates, scoresData, displayedScores, gridData, weekDatesTable]);
+  
   //#endregion
 
   //#region Handlers
@@ -352,8 +351,6 @@ const App = () => {
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ displayedScores, weekDatesTable }) => {
 
-    // console.log(displayedScores);
-
     return (
       <div className="SubmittedScores">
         <table>
@@ -467,7 +464,7 @@ const App = () => {
         </table>
       </div>
       <div className="Footer">
-        <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable}/>
+        <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
         {isAddHabitVisible && (
           <div className="AddHabit">
             <input

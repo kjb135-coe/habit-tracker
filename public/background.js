@@ -16,7 +16,7 @@
 chrome.tabs.onCreated.addListener(function (tab) {
   // A new tab was created, do something...
   // Get the state from storage
-  console.log('created');
+  // console.log('created');
   chrome.storage.sync.get(['state'], function (result) {
     // Listen for when the tab is updated
     chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
@@ -51,7 +51,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 let currentTabId;
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-  console.log('activated');
+  // console.log('activated');
   if (currentTabId !== undefined) {
     // The previously active tab is no longer active, save the state
 
@@ -61,7 +61,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         // Save the state of the previous tab
         let newState = {...result.state, [currentTabId]: {/* state of the tab */}};
         chrome.storage.sync.set({state: newState}, function() {
-          console.log('State saved for tab ' + currentTabId);
+          // console.log('State saved for tab ' + currentTabId);
         });
       });
     }, 500);
