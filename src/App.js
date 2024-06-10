@@ -89,6 +89,9 @@ const App = () => {
           weekDates,
           showStartupPopup,
           userName,
+          weekDatesTable,
+          displayedScores,
+          prevDay
         }
       });
     }, 660);
@@ -106,6 +109,9 @@ const App = () => {
     weekDates,
     showStartupPopup,
     userName,
+    weekDatesTable,
+    displayedScores,
+    prevDay
   ]);
 
   // Listen for messages from the content script
@@ -134,6 +140,9 @@ const App = () => {
           setWeekDates(payload.weekDates);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
+          setWeekDatesTable(payload.weekDatesTable);
+          setDisplayedScores(payload.displayedScores);
+          setPrevDay(payload.prevDay);
         } else if (payload) {
           // Handle other messages
           setGridData(payload.gridData);
@@ -147,6 +156,9 @@ const App = () => {
           setWeekDates(payload.weekDates);
           setShowStartupPopup(payload.showStartupPopup);
           setUserName(payload.userName);
+          setWeekDatesTable(payload.weekDatesTable);
+          setDisplayedScores(payload.displayedScores);
+          setPrevDay(payload.prevDay);
         }
       }
     }
