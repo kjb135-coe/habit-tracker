@@ -240,9 +240,9 @@ const App = () => {
 
     setDisplayedScores([
       [weekDatesTable[0], calculateScore()],
-      [weekDatesTable[1], displayedScores[1][1]],
-      [weekDatesTable[2], displayedScores[2][1]],
-      [weekDatesTable[3], displayedScores[3][1]],
+      [weekDatesTable[1], displayedScores[0][1]],
+      [weekDatesTable[2], displayedScores[1][1]],
+      [weekDatesTable[3], displayedScores[2][1]],
     ]);
 
     setGridData(newGridData);
