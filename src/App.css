@@ -1,10 +1,12 @@
 body {
   margin: 0;
   padding: 0;
-  background-image: url("wp2.jpg");
+  background-image: url("paper-background_53876-147734.avif");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  font-family: 'Roboto', sans-serif; /* Ensure a consistent font across the app */
+  color: #000000;
 }
 
 .App {
@@ -13,34 +15,29 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-family: 'Roboto', sans-serif;
-  color: #ffffff;
   min-height: 100vh;
 }
 
 .App-header {
   padding-top: 50px;
-  /* padding: 30px; */
   padding-bottom: 15px;
-  border-bottom: 0px solid #555;
 }
 
 .App-title {
   font-size: 36px;
-  font-family: 'Constitution', sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
-  color: #ffffff; 
+  color: #000000; 
 }
-
 
 .GridContainer {
   flex: 3;
-  width: 100%; /* Set width to 75% */
+  width: 100%;
   overflow-x: auto;
 }
 
 .Grid {
-  width: 100%; /* Adjust width */
+  width: 100%;
   table-layout: fixed;
 }
 
@@ -54,22 +51,23 @@ table {
   margin: 0 auto;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly increased shadow for depth */
+  background-color: rgba(255, 255, 255, 0.8); /* Light background for better readability */
 }
 
 th, td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 12px;
   text-align: center;
 }
 
 th {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 td {
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 5px;
 }
 
@@ -100,44 +98,35 @@ td.green:hover, td.red:hover, td.middle:hover {
 .AddHabit {
   display: flex;
   position: fixed;
-  right: 200px;
-  bottom: 60px;
+  right: 20px;
+  bottom: 20px;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
 .AddHabit input[type="text"],
 .AddHabit select {
-  margin-right: 10px;
-  padding: 5px;
+  padding: 10px;
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  opacity: 0.8;
+  transition: all 0.3s ease;
 }
 
 .AddHabit button {
-  padding: 5px 15px;
+  padding: 10px 20px;
   font-size: 16px;
   background-color: #105be7;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  opacity: 0.8;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
 .AddHabit button:hover {
   background-color: #0a3da5;
-  opacity: 1.0;
-}
-
-.AddHabit select:hover {
-  opacity: 1.0;
-}
-
-.AddHabit input:hover {
-  opacity: 1.0;
 }
 
 .EditButtonContainer {
@@ -164,43 +153,42 @@ td.green:hover, td.red:hover, td.middle:hover {
   top: 50px;
   right: 10px;
   background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px; /* Increased border radius for a softer look */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Enhanced box shadow for depth */
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  padding: 10px; /* Increased padding for better spacing */
+  padding: 10px;
   z-index: 1000;
-  width: 125px; /* Adjust the width as needed */
+  width: 125px;
 }
 
 .Dropdown button {
   background-color: transparent;
   border: none;
-  padding: 5px; /* Increased padding for better touch/click targets */
+  padding: 10px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease; /* Smooth background color transition */
+  transition: background-color 0.3s ease;
 }
 
 .Dropdown button:hover {
-  background-color: #f2f2f2; /* Hover background color */
-  border-radius: 5px; /* Rounded corners on hover */
+  background-color: #f2f2f2;
+  border-radius: 5px;
 }
 
 .Footer {
   display: flex;
-  flex-direction: column; /* Change to a column layout */
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  height: 100%; /* Ensure the Footer takes up the entire height */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   padding-bottom: 60px;
 }
 
-
 .SubmittedScores {
   position: fixed;
-  left: 200px;
-  bottom: 60px;
+  left: 20px;
+  bottom: 20px;
 }
 
 .SubmittedScores h2 {
@@ -220,14 +208,12 @@ td.green:hover, td.red:hover, td.middle:hover {
   border: 1px solid #ccc;
 }
 
-/* Style for the green checkmark emoji */
 .green-emoji {
-  font-size: 18px; /* Adjust the font size as needed */
-  color: green; /* Change the color to match your design */
+  font-size: 18px;
+  color: green;
 }
 
-/* Style for the red x emoji */
 .red-emoji {
-  font-size: 18px; /* Adjust the font size as needed */
-  color: red; /* Change the color to match your design */
+  font-size: 18px;
+  color: red;
 }

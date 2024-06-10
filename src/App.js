@@ -2,6 +2,9 @@
 
 import './App.css';
 import React, { useState, useEffect } from 'react';
+// import { AppBar, Toolbar, Typography, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Select, MenuItem, Box, Container, CssBaseline } from '@mui/material';
+// import AddIcon from '@mui/icons-material/Add';
+// import DeleteIcon from '@mui/icons-material/Delete';
 import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
 
@@ -194,9 +197,9 @@ const App = () => {
   
       setDisplayedScores([
         [weekDatesTable[0], 0],
-        [weekDatesTable[1], displayedScores[1][1]],
-        [weekDatesTable[2], displayedScores[2][1]],
-        [weekDatesTable[3], displayedScores[3][1]],
+        [weekDatesTable[1], displayedScores[0][1]],
+        [weekDatesTable[2], displayedScores[1][1]],
+        [weekDatesTable[3], displayedScores[2][1]],
       ]);
   
       setScoresData(newScoresData);
@@ -220,9 +223,8 @@ const App = () => {
 
     if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
       // Handle when selectedWCount is not defined or set to 'Enter Max Points'
-      if (selectedWCount === 'Enter Max Points') alert('enter max points.');
-      else alert('undefined.');
-      alert('Please add a habit or select the max number of points for this habit.');
+      if (selectedWCount === 'Enter Max Points') alert('Please add a habit or select the max number of points for this habit.');
+      
       return;
     }
 
