@@ -2,10 +2,7 @@
 
 import './App.css';
 import React, { useState, useEffect } from 'react';
-// import { AppBar, Toolbar, Typography, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Select, MenuItem, Box, Container, CssBaseline } from '@mui/material';
-// import AddIcon from '@mui/icons-material/Add';
-// import DeleteIcon from '@mui/icons-material/Delete';
-import LineChart from './LineChart';
+// import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
 
 const App = () => {
@@ -179,39 +176,39 @@ const App = () => {
   useEffect(() => {
     const now = new Date();
     const currentDay = now.getDay();
-  
+
     // Check if today is Monday and the previous day was Sunday
     if (currentDay === 1 && prevDay === 0) {
       const newDate = new Date(startDate);
       newDate.setDate(startDate.getDate() + 7);
-  
+
       const currentWeek = weekDates[0];
       const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
-  
+
       setWeekDatesTable([
         calculateWeekDate(newDate, 0),
         calculateWeekDate(newDate, 1),
         calculateWeekDate(newDate, 2),
         calculateWeekDate(newDate, 3),
       ]);
-  
+
       setDisplayedScores([
         [weekDatesTable[0], 0],
         [weekDatesTable[1], displayedScores[0][1]],
         [weekDatesTable[2], displayedScores[1][1]],
         [weekDatesTable[3], displayedScores[2][1]],
       ]);
-  
+
       setScoresData(newScoresData);
       setWeekDates(getCurrentWeekDates(newDate));
       clearGridData(gridData);
       setStartDate(newDate);
     }
-  
+
     // Update the previous day to current day for the next check
     setPrevDay(currentDay);
   }, [prevDay, startDate, weekDates, scoresData, displayedScores, gridData, weekDatesTable]);
-  
+
   //#endregion
 
   //#region Handlers
@@ -224,7 +221,7 @@ const App = () => {
     if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
       // Handle when selectedWCount is not defined or set to 'Enter Max Points'
       if (selectedWCount === 'Enter Max Points') alert('Please add a habit or select the max number of points for this habit.');
-      
+
       return;
     }
 
@@ -480,7 +477,7 @@ const App = () => {
       <div className="Footer">
         <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
         {isAddHabitVisible && (
-          <div className="AddHabit">
+          <div className="AddHabitPopup">
             <input
               type="text"
               placeholder="New Habit Name"
@@ -504,6 +501,7 @@ const App = () => {
       </div>
     </div>
   );
+
   //#endregion
 };
 

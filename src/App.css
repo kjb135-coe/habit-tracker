@@ -95,37 +95,44 @@ td.green:hover, td.red:hover, td.middle:hover {
   opacity: 0.8;
 }
 
-.AddHabit {
-  display: flex;
+.AddHabitPopup {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it appears above other elements */
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.AddHabit input[type="text"],
-.AddHabit select {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  transition: all 0.3s ease;
+.AddHabitPopup input[type="text"],
+.AddHabitPopup select,
+.AddHabitPopup button {
+  width: 100%; /* Ensures width is the same */
+  padding: 10px; /* Standardizes padding */
+  margin: 0; /* Resets margin */
+  border: 1px solid #ccc; /* Standardizes border */
+  box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+  font-size: 16px; /* Ensures font size is the same */
+  border-radius: 5px; /* Round the corners */
 }
 
-.AddHabit button {
-  padding: 10px 20px;
-  font-size: 16px;
+.AddHabitPopup button {
   background-color: #105be7;
   color: #fff;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
-.AddHabit button:hover {
+.AddHabitPopup button:hover {
   background-color: #0a3da5;
 }
 
