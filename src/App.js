@@ -1,9 +1,54 @@
 /* global chrome */
 
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
+import lottie from 'lottie-web';
+
+//#region Animations
+// Lottie checkmark animation
+const LottieCheckmark = () => {
+  const animationContainer = useRef(null);
+
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        path: 'C:/Users/keega/React/habit-tracker/src/checkmark_lottie.json' // Ensure the path is correct and accessible
+      });
+
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return <div ref={animationContainer} ></div>;
+};
+
+// Lottie xmark animation
+const LottieXmark = () => {
+  const animationContainer = useRef(null);
+
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        path: 'C:/Users/keega/React/habit-tracker/src/xmark_lottie.json' // Ensure the path is correct and accessible
+      });
+
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return <div ref={animationContainer}></div>;
+};
+//#endregion
 
 const App = () => {
 
@@ -403,7 +448,6 @@ const App = () => {
       )}
       <div className="EditButtonContainer">
         <button className="EditButton" onClick={handleAddHabitClick}>
-          <img src="editButton.png" alt="" />
         </button>
         {showAddHabit && (
           <div className="Dropdown">
@@ -454,12 +498,10 @@ const App = () => {
                   >
                     {value >= 1 && value <= 3
                       ? Array.from({ length: value }, (v, i) => (
-                        <span key={i} className="green-emoji">
-                          ✅
-                        </span>
+                        <LottieCheckmark key={i} />
                       ))
                       : value === -1
-                        ? <span className="red-emoji">❌</span>
+                        ? <LottieXmark />
                         : ''}
                   </td>
                 ))}
