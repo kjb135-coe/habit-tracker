@@ -37,12 +37,43 @@ body {
 }
 
 .Grid {
-  width: 100%;
-  table-layout: fixed;
+  display: grid;
+  font-family: 'Roboto', sans-serif;
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly increased shadow for depth */
+  background-color: rgba(255, 255, 255, 0.8); /* Light background for better readability */
+  border: 1px solid #ddd;
+  grid-template-columns: auto repeat(7, 1fr);
 }
 
-.Grid td:first-child {
+.GridHeader, .GridFooter {
+  display: contents;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.GridRow {
+  display: contents;
+  font-size: 18px;
+}
+
+.GridCell {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 16px;
+}
+
+.GridCell:first-child {
   text-align: left;
+  white-space: nowrap; /* Prevent the first column from wrapping */
+}
+
+.GridCellSpan {
+  grid-column: span 7; /* Span 7 columns */
 }
 
 table {
@@ -59,6 +90,7 @@ th, td {
   border: 1px solid #ddd;
   padding: 12px;
   text-align: center;
+  width: '14.28%'; /* Equal width for each column */
 }
 
 th {
@@ -87,11 +119,11 @@ table td:first-child {
   cursor: pointer;
 }
 
-td.green, td.red, td.middle {
+.GridCell.green, .GridCell.red, .GridCell.middle {
   transition: background-color 0.3s ease;
 }
 
-td.green:hover, td.red:hover, td.middle:hover {
+.GridCell.green:hover, .GridCell.red:hover, .GridCell.middle:hover {
   opacity: 0.8;
 }
 

@@ -475,46 +475,40 @@ const App = () => {
         <header className="App-header">
           <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr 🚀`}</h1>
         </header>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              {weekDates.map((date, dayIndex) => (
-                <th key={dayIndex}>{date}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {gridData.map((habit, habitIndex) => (
-              <tr key={habitIndex}>
-                <td>{habit.habit}</td>
-                {habit.days.map((value, dayIndex) => (
-                  <td
-                    key={dayIndex}
-                    className={
-                      value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'
-                    }
-                    onClick={() => handleCellClick(habitIndex, dayIndex)}
-                  >
-                    {value >= 1 && value <= 3
-                      ? Array.from({ length: value }, (v, i) => (
-                        <LottieCheckmark key={i} />
-                      ))
-                      : value === -1
-                        ? <LottieXmark />
-                        : ''}
-                  </td>
-                ))}
-              </tr>
+        <div className="Grid">
+          <div className="GridHeader">
+            <div className="GridCell"></div>
+            {weekDates.map((date, dayIndex) => (
+              <div key={dayIndex} className="GridCell">{date}</div>
             ))}
-            <tr>
-              <td>Score</td>
-              <td colSpan="7">
-                <b>{calculateScore()} </b>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          </div>
+          {gridData.map((habit, habitIndex) => (
+            <div key={habitIndex} className="GridRow">
+              <div className="GridCell">{habit.habit}</div>
+              {habit.days.map((value, dayIndex) => (
+                <div
+                  key={dayIndex}
+                  className={`GridCell ${value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'}`}
+                  onClick={() => handleCellClick(habitIndex, dayIndex)}
+                >
+                  {value >= 1 && value <= 3
+                    ? Array.from({ length: value }, (v, i) => (
+                      <LottieCheckmark key={i} />
+                    ))
+                    : value === -1
+                      ? <LottieXmark />
+                      : ''}
+                </div>
+              ))}
+            </div>
+          ))}
+          <div className="GridFooter">
+            <div className="GridCell">Score</div>
+            <div className="GridCell GridCellSpan">
+              <b>{calculateScore()} </b>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="Footer">
         <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
