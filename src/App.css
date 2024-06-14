@@ -61,6 +61,9 @@ body {
 }
 
 .GridCell {
+  display: flex;
+  justify-content: center; /* Centers children horizontally in the container */
+  align-items: center; 
   padding: 12px;
   border: 1px solid #ddd;
   text-align: center;

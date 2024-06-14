@@ -4,53 +4,59 @@ import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 // import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
-import Lottie from 'lottie-web';
-import Checkmark from 'C:/Users/keega/React/habit-tracker/src/checkmark_lottie.json';
-import Xmark from 'C:/Users/keega/React/habit-tracker/src/xmark_lottie.json';
+import lottie from 'lottie-web';
 
-//#region Animations
+// #region Animations
 // Lottie checkmark animation
-// const LottieCheckmark = () => {
-//   const animationContainer = useRef(null);
+const LottieCheckmark = () => {
+  const animationContainer = useRef(null);
 
-//   useEffect(() => {
-//     if (animationContainer.current) {
-//       const anim = lottie.loadAnimation({
-//         container: animationContainer.current,
-//         renderer: 'svg',
-//         loop: false,
-//         autoplay: true,
-//         path: 'C:/Users/keega/React/habit-tracker/src/checkmark_lottie.json' // Ensure the path is correct and accessible
-//       });
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        style: {height: '22px', width: '22px'},
+        rendererSettings: {
+          preserveAspectRatio: 'xMidYMid slice',
+        },
+        path: 'C:/Users/keega/React/habit-tracker/src/checkmark_lottie.json' // Ensure the path is correct and accessible
+      });
 
-//       return () => anim.destroy();
-//     }
-//   }, []);
+      return () => anim.destroy();
+    }
+  }, []);
 
-//   return <div ref={animationContainer} ></div>;
-// };
+  return <div ref={animationContainer} ></div>;
+};
 
-// // Lottie xmark animation
-// const LottieXmark = () => {
-//   const animationContainer = useRef(null);
+// Lottie xmark animation
+const LottieXmark = () => {
+  const animationContainer = useRef(null);
 
-//   useEffect(() => {
-//     if (animationContainer.current) {
-//       const anim = lottie.loadAnimation({
-//         container: animationContainer.current,
-//         renderer: 'svg',
-//         loop: false,
-//         autoplay: true,
-//         path: 'C:/Users/keega/React/habit-tracker/src/xmark_lottie.json' // Ensure the path is correct and accessible
-//       });
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        style: {height: '22px', width: '22px'},
+        rendererSettings: {
+          preserveAspectRatio: 'xMidYMid slice',
+        },
+        path: 'C:/Users/keega/React/habit-tracker/src/xmark_lottie.json' // Ensure the path is correct and accessible
+      });
 
-//       return () => anim.destroy();
-//     }
-//   }, []);
+      return () => anim.destroy();
+    }
+  }, []);
 
-//   return <div ref={animationContainer}></div>;
-// };
-//#endregion
+  return <div ref={animationContainer}></div>;
+};
+// #endregion
 
 const App = () => {
 
@@ -477,9 +483,6 @@ const App = () => {
         <header className="App-header">
           <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr 🚀`}</h1>
         </header>
-        <div>
-          <Lottie animationData={Checkmark} />
-        </div>
         <div className="Grid">
           <div className="GridHeader">
             <div className="GridCell"></div>
@@ -498,14 +501,14 @@ const App = () => {
                 >
                   {value >= 1 && value <= 3
                     ? Array.from({ length: value }, (v, i) => (
-                      <div style={{ width: '18px', height: '18px' }}>
-                        <Lottie options={{ animationData: Checkmark, loop: false, autoplay: true }} />
+                      <div style={{ width: '22px', height: '22px' }}>
+                        <LottieCheckmark key={i} />
                       </div>
                     ))
                     : value === -1
                       ?
-                      <div style={{ width: '18px', height: '18px' }}>
-                        <Lottie options={{ animationData: Xmark, loop: false, autoplay: true }} />
+                      <div style={{ width: '40px', height: '40px' }}>
+                        <LottieXmark />
                       </div>
                       : ''}
                 </div>
