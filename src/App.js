@@ -233,7 +233,7 @@ const App = () => {
     // Check if today is Monday and the previous day was Sunday
     if (currentDay === 1 && prevDay === 0) {
       const newDate = new Date(startDate);
-      newDate.setDate(startDate.getDate() + 7);
+      newDate.setDate(startDate.getDate());
 
       const currentWeek = weekDates[0];
       const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
