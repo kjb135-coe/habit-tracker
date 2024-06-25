@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // import LineChart from './LineChart';
 import StartupPopup from './StartupPopup';
 import lottie from 'lottie-web';
+import { CssBaseline, Container, Typography, Box } from '@mui/material';
 
 // #region Animations
 // Lottie checkmark animation
@@ -123,6 +124,18 @@ const App = () => {
   //#endregion
 
   //#region Hooks
+  // useEffect(() => {
+  //   chrome.storage.sync.get(['userName', 'userHabit'], (result) => {
+  //     if (result.userName) {
+  //       setUserName(result.userName);
+  //       setShowStartupPopup(false);
+  //     }
+  //     if (result.userHabit) {
+  //       setUserHabit(result.userHabit);
+  //     }
+  //   });
+  // }, []);
+
   // Communcation for background/content workers
   // Triggerred whenever any of the states listed are changed
   // Chrome only allows 120 requests per minute, so this is a workaround
@@ -361,9 +374,12 @@ const App = () => {
   const handleNameSubmit = (name) => {
     // Set the user's name when it's submitted
     setUserName(name);
+  };
 
-    // Close the startup popup
+  const handlePopupClose = (habitData) => {
+    // setUserHabit(habitData);
     setShowStartupPopup(false);
+    // chrome.storage.sync.set({ userHabit: habitData });
   };
 
   //#endregion
@@ -450,105 +466,111 @@ const App = () => {
 
   //#region Render (HTML)
   return (
-    <div className="App">
-      {showStartupPopup && ( // Render the popup if showStartupPopup is true
-        <StartupPopup onClose={() => setShowStartupPopup(false)} onNameSubmit={handleNameSubmit} />
+    <Container className="App">
+      <CssBaseline />
+      {showStartupPopup && (
+        <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
       )}
-      <div className="EditButtonContainer">
-        <button className="EditButton" onClick={handleAddHabitClick}>
-        </button>
-        {showAddHabit && (
-          <div className="Dropdown">
-            <button onClick={toggleAddHabit}>Add Habit</button>
-            <button className="DeleteButton" onClick={handleDeleteHabitClick}>
-              Delete Habit
-            </button>
-            {isDeleteDropdownVisible && (
-              <div className="DeleteDropdown">
-                {gridData.map((habit, habitIndex) => (
-                  <button
-                    className="DeleteHabitButton"
-                    key={habitIndex}
-                    onClick={() => handleHabitDelete(habitIndex)}
-                  >
-                    {habit.habit}
-                  </button>
-                ))}
+      {!showStartupPopup && (
+        <>
+          <Box className="App-header">
+            <Typography variant="h3">Welcome to Trackr, {userName}!</Typography>
+          </Box>
+          <div className="EditButtonContainer">
+            <button className="EditButton" onClick={handleAddHabitClick}></button>
+            {showAddHabit && (
+              <div className="Dropdown">
+                <button onClick={toggleAddHabit}>Add Habit</button>
+                <button className="DeleteButton" onClick={handleDeleteHabitClick}>
+                  Delete Habit
+                </button>
+                {isDeleteDropdownVisible && (
+                  <div className="DeleteDropdown">
+                    {gridData.map((habit, habitIndex) => (
+                      <button
+                        className="DeleteHabitButton"
+                        key={habitIndex}
+                        onClick={() => handleHabitDelete(habitIndex)}
+                      >
+                        {habit.habit}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
-      <div className="GridContainer">
-        <header className="App-header">
-          <h1 className="App-title">{showStartupPopup ? 'Trackr' : `${userName}'s Trackr 🚀`}</h1>
-        </header>
-        <div className="Grid">
-          <div className="GridHeader">
-            <div className="GridCell"></div>
-            {weekDates.map((date, dayIndex) => (
-              <div key={dayIndex} className="GridCell">{date}</div>
-            ))}
-          </div>
-          {gridData.map((habit, habitIndex) => (
-            <div key={habitIndex} className="GridRow">
-              <div className="GridCell">{habit.habit}</div>
-              {habit.days.map((value, dayIndex) => (
-                <div
-                  key={dayIndex}
-                  className={`GridCell ${value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'}`}
-                  onClick={() => handleCellClick(habitIndex, dayIndex)}
-                >
-                  {value >= 1 && value <= 3
-                    ? Array.from({ length: value }, (v, i) => (
-                      <div style={{ width: '22px', height: '22px' }}>
-                        <LottieCheckmark key={i} />
-                      </div>
-                    ))
-                    : value === -1
-                      ?
-                      <div style={{ width: '40px', height: '40px' }}>
-                        <LottieXmark />
-                      </div>
-                      : ''}
+          <div className="GridContainer">
+            <header className="App-header">
+              <h1 className="App-title">{userName}'s Trackr 🚀</h1>
+            </header>
+            <div className="Grid">
+              <div className="GridHeader">
+                <div className="GridCell"></div>
+                {weekDates.map((date, dayIndex) => (
+                  <div key={dayIndex} className="GridCell">{date}</div>
+                ))}
+              </div>
+              {gridData.map((habit, habitIndex) => (
+                <div key={habitIndex} className="GridRow">
+                  <div className="GridCell">{habit.habit}</div>
+                  {habit.days.map((value, dayIndex) => (
+                    <div
+                      key={dayIndex}
+                      className={`GridCell ${value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'}`}
+                      onClick={() => handleCellClick(habitIndex, dayIndex)}
+                    >
+                      {value >= 1 && value <= 3
+                        ? Array.from({ length: value }, (v, i) => (
+                          <div style={{ width: '22px', height: '22px' }}>
+                            <LottieCheckmark key={i} />
+                          </div>
+                        ))
+                        : value === -1
+                          ?
+                          <div style={{ width: '40px', height: '40px' }}>
+                            <LottieXmark />
+                          </div>
+                          : ''}
+                    </div>
+                  ))}
                 </div>
               ))}
-            </div>
-          ))}
-          <div className="GridFooter">
-            <div className="GridCell">Score</div>
-            <div className="GridCell GridCellSpan">
-              <b>{calculateScore()} </b>
+              <div className="GridFooter">
+                <div className="GridCell">Score</div>
+                <div className="GridCell GridCellSpan">
+                  <b>{calculateScore()} </b>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="Footer">
-        <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
-        {isAddHabitVisible && (
-          <div className="AddHabitPopup">
-            <input
-              type="text"
-              placeholder="New Habit Name"
-              value={newHabitName}
-              onChange={(e) => setNewHabitName(e.target.value)}
-            />
-            <select
-              value={selectedWCount}
-              onChange={(e) => setSelectedWCount(e.target.value)}
-            >
-              <option disabled>Enter Max Points</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-            <button onClick={handleAddNewHabit}>Add</button>
+          <div className="Footer">
+            <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
+            {isAddHabitVisible && (
+              <div className="AddHabitPopup">
+                <input
+                  type="text"
+                  placeholder="New Habit Name"
+                  value={newHabitName}
+                  onChange={(e) => setNewHabitName(e.target.value)}
+                />
+                <select
+                  value={selectedWCount}
+                  onChange={(e) => setSelectedWCount(e.target.value)}
+                >
+                  <option disabled>Enter Max Points</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+                <button onClick={handleAddNewHabit}>Add</button>
+              </div>
+            )}
+            <p>&copy; 2024 Trackr v1.0.0</p>
           </div>
-        )}
-        <p>&copy; 2024 Trackr v1.0.0</p>
-        {/* <LineChart /> */}
-      </div>
-    </div>
+        </>
+      )}
+    </Container>
   );
 
   //#endregion
