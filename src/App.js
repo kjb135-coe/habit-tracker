@@ -19,7 +19,7 @@ const LottieCheckmark = () => {
         renderer: 'svg',
         loop: false,
         autoplay: true,
-        style: {height: '22px', width: '22px'},
+        style: { height: '22px', width: '22px' },
         rendererSettings: {
           preserveAspectRatio: 'xMidYMid slice',
         },
@@ -44,7 +44,7 @@ const LottieXmark = () => {
         renderer: 'svg',
         loop: false,
         autoplay: true,
-        style: {height: '22px', width: '22px'},
+        style: { height: '22px', width: '22px' },
         rendererSettings: {
           preserveAspectRatio: 'xMidYMid slice',
         },
@@ -139,104 +139,104 @@ const App = () => {
   // Communcation for background/content workers
   // Triggerred whenever any of the states listed are changed
   // Chrome only allows 120 requests per minute, so this is a workaround
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Store the state in memory using chrome.storage.sync
-      chrome.storage.sync.set({
-        state: {
-          gridData,
-          showAddHabit,
-          newHabitName,
-          selectedWCount,
-          isDropdownVisible,
-          isAddHabitVisible,
-          isDeleteDropdownVisible,
-          scoresData,
-          weekDates,
-          showStartupPopup,
-          userName,
-          weekDatesTable,
-          displayedScores,
-          prevDay
-        }
-      });
-    }, 660);
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(interval);
-  }, [
-    gridData,
-    showAddHabit,
-    newHabitName,
-    selectedWCount,
-    isDropdownVisible,
-    isAddHabitVisible,
-    isDeleteDropdownVisible,
-    scoresData,
-    weekDates,
-    showStartupPopup,
-    userName,
-    weekDatesTable,
-    displayedScores,
-    prevDay
-  ]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // Store the state in memory using chrome.storage.sync
+  //     chrome.storage.sync.set({
+  //       state: {
+  //         gridData,
+  //         showAddHabit,
+  //         newHabitName,
+  //         selectedWCount,
+  //         isDropdownVisible,
+  //         isAddHabitVisible,
+  //         isDeleteDropdownVisible,
+  //         scoresData,
+  //         weekDates,
+  //         showStartupPopup,
+  //         userName,
+  //         weekDatesTable,
+  //         displayedScores,
+  //         prevDay
+  //       }
+  //     });
+  //   }, 660);
+  //   // Clean up the interval when the component unmounts
+  //   return () => clearInterval(interval);
+  // }, [
+  //   gridData,
+  //   showAddHabit,
+  //   newHabitName,
+  //   selectedWCount,
+  //   isDropdownVisible,
+  //   isAddHabitVisible,
+  //   isDeleteDropdownVisible,
+  //   scoresData,
+  //   weekDates,
+  //   showStartupPopup,
+  //   userName,
+  //   weekDatesTable,
+  //   displayedScores,
+  //   prevDay
+  // ]);
 
-  // Listen for messages from the content script
-  useEffect(() => {
-    function handleMessage(event) {
-      // Only trust messages from the same frame
-      if (event.source !== window) return;
+  // // Listen for messages from the content script
+  // useEffect(() => {
+  //   function handleMessage(event) {
+  //     // Only trust messages from the same frame
+  //     if (event.source !== window) return;
 
-      const message = event.data;
+  //     const message = event.data;
 
-      // Make sure the message has the correct format
-      if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
-        const payload = message.payload;
+  //     // Make sure the message has the correct format
+  //     if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
+  //       const payload = message.payload;
 
-        // Check the payload type
-        if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
-          // A new tab was created, update the state
-          setGridData(payload.gridData);
-          setShowAddHabit(payload.showAddHabit);
-          setNewHabitName(payload.newHabitName);
-          setSelectedWCount(payload.selectedWCount);
-          setIsDropdownVisible(payload.isDropdownVisible);
-          setIsAddHabitVisible(payload.isAddHabitVisible);
-          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-          setScoresData(payload.scoresData);
-          setWeekDates(payload.weekDates);
-          setShowStartupPopup(payload.showStartupPopup);
-          setUserName(payload.userName);
-          setWeekDatesTable(payload.weekDatesTable);
-          setDisplayedScores(payload.displayedScores);
-          setPrevDay(payload.prevDay);
-        } else if (payload) {
-          // Handle other messages
-          setGridData(payload.gridData);
-          setShowAddHabit(payload.showAddHabit);
-          setNewHabitName(payload.newHabitName);
-          setSelectedWCount(payload.selectedWCount);
-          setIsDropdownVisible(payload.isDropdownVisible);
-          setIsAddHabitVisible(payload.isAddHabitVisible);
-          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-          setScoresData(payload.scoresData);
-          setWeekDates(payload.weekDates);
-          setShowStartupPopup(payload.showStartupPopup);
-          setUserName(payload.userName);
-          setWeekDatesTable(payload.weekDatesTable);
-          setDisplayedScores(payload.displayedScores);
-          setPrevDay(payload.prevDay);
-        }
-      }
-    }
+  //       // Check the payload type
+  //       if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
+  //         // A new tab was created, update the state
+  //         setGridData(payload.gridData);
+  //         setShowAddHabit(payload.showAddHabit);
+  //         setNewHabitName(payload.newHabitName);
+  //         setSelectedWCount(payload.selectedWCount);
+  //         setIsDropdownVisible(payload.isDropdownVisible);
+  //         setIsAddHabitVisible(payload.isAddHabitVisible);
+  //         setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+  //         setScoresData(payload.scoresData);
+  //         setWeekDates(payload.weekDates);
+  //         setShowStartupPopup(payload.showStartupPopup);
+  //         setUserName(payload.userName);
+  //         setWeekDatesTable(payload.weekDatesTable);
+  //         setDisplayedScores(payload.displayedScores);
+  //         setPrevDay(payload.prevDay);
+  //       } else if (payload) {
+  //         // Handle other messages
+  //         setGridData(payload.gridData);
+  //         setShowAddHabit(payload.showAddHabit);
+  //         setNewHabitName(payload.newHabitName);
+  //         setSelectedWCount(payload.selectedWCount);
+  //         setIsDropdownVisible(payload.isDropdownVisible);
+  //         setIsAddHabitVisible(payload.isAddHabitVisible);
+  //         setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+  //         setScoresData(payload.scoresData);
+  //         setWeekDates(payload.weekDates);
+  //         setShowStartupPopup(payload.showStartupPopup);
+  //         setUserName(payload.userName);
+  //         setWeekDatesTable(payload.weekDatesTable);
+  //         setDisplayedScores(payload.displayedScores);
+  //         setPrevDay(payload.prevDay);
+  //       }
+  //     }
+  //   }
 
-    // Add event listener for messages
-    window.addEventListener('message', handleMessage);
+  //   // Add event listener for messages
+  //   window.addEventListener('message', handleMessage);
 
-    // Make sure to clean up event listeners when the component unmounts
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, []);
+  //   // Make sure to clean up event listeners when the component unmounts
+  //   return () => {
+  //     window.removeEventListener('message', handleMessage);
+  //   };
+  // }, []);
 
   // Check for new week
   useEffect(() => {
@@ -469,7 +469,7 @@ const App = () => {
     <Container className="App">
       <CssBaseline />
       {showStartupPopup && (
-        <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
+          <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
       )}
       {!showStartupPopup && (
         <>
