@@ -469,13 +469,10 @@ const App = () => {
     <Container className="App">
       <CssBaseline />
       {showStartupPopup && (
-          <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
+        <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
       )}
       {!showStartupPopup && (
         <>
-          <Box className="App-header">
-            <Typography variant="h3">Welcome to Trackr, {userName}!</Typography>
-          </Box>
           <div className="EditButtonContainer">
             <button className="EditButton" onClick={handleAddHabitClick}></button>
             {showAddHabit && (

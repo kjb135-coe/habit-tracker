@@ -9,12 +9,14 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
   const [habit, setHabit] = useState('');
   const [points, setPoints] = useState(1);
 
-  const handleNameSubmit = () => {
+  const handleNameSubmit = (e) => {
+    e.preventDefault();
     onNameSubmit(name);
     setView(2);
   };
 
-  const handleHabitSubmit = () => {
+  const handleHabitSubmit = (e) => {
+    e.preventDefault();
     const habitData = { habit, points };
     onClose(habitData);
   };
@@ -35,13 +37,14 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
     switch (currentView) {
       case 1:
         return (
-          <motion.div
+          <motion.form
             key={1}
             initial="initial"
             animate="in"
             exit="out"
             variants={pageVariants}
             transition={pageTransition}
+            onSubmit={handleNameSubmit}
           >
             <Typography variant="h4">Welcome to Trackr!</Typography>
             <TextField
@@ -53,24 +56,28 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               margin="normal"
             />
             <Button
+              type="submit"
               variant="contained"
-              onClick={handleNameSubmit}
               disabled={!name}
               fullWidth
             >
               Continue
             </Button>
-          </motion.div>
+          </motion.form>
         );
       case 2:
         return (
-          <motion.div
+          <motion.form
             key={2}
             initial="initial"
             animate="in"
             exit="out"
             variants={pageVariants}
             transition={pageTransition}
+            onSubmit={(e) => {
+              e.preventDefault();
+              setView(3);
+            }}
           >
             <Typography variant="h5">How to Add Habits</Typography>
             <ul>
@@ -79,23 +86,24 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               <li>Click on the cells to track your progress.</li>
             </ul>
             <Button
+              type="submit"
               variant="contained"
-              onClick={() => setView(3)}
               fullWidth
             >
               Continue
             </Button>
-          </motion.div>
+          </motion.form>
         );
       case 3:
         return (
-          <motion.div
+          <motion.form
             key={3}
             initial="initial"
             animate="in"
             exit="out"
             variants={pageVariants}
             transition={pageTransition}
+            onSubmit={handleHabitSubmit}
           >
             <Typography variant="h5">Add Your First Habit</Typography>
             <TextField
@@ -117,14 +125,14 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               margin="normal"
             />
             <Button
+              type="submit"
               variant="contained"
-              onClick={handleHabitSubmit}
               disabled={!habit || points < 1 || points > 3}
               fullWidth
             >
               Add Habit
             </Button>
-          </motion.div>
+          </motion.form>
         );
       default:
         return null;

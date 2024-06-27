@@ -57,7 +57,7 @@
 }
 
 .StartupPopup .MuiButton-root {
-  background-color: #4CAF50;
+  background-color: #105be7;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -67,7 +67,7 @@
 }
 
 .StartupPopup .MuiButton-root:hover {
-  background-color: #45a049;
+  background-color: #0a3da5;
 }
 
 .StartupPopup .MuiButton-root:disabled {
