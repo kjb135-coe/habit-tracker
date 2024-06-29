@@ -34,6 +34,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import HabitGrid from './components/HabitGrid';
 import StartupPopup from './components/StartupPopup';
+import extensionIcon from './extensionIcon.png';
 import lottie from 'lottie-web';
 
 const theme = createTheme({
@@ -138,7 +139,7 @@ const App = () => {
   ]);
 
   const [gridData, setGridData] = useState([
-    { habit: 'Click the edit icon and "Add Habit".', days: [0, 0, 0, 0, 0, 0, 0] },
+    { habit: '', days: [0, 0, 0, 0, 0, 0, 0], streak: 0 },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -355,6 +356,17 @@ const App = () => {
       [weekDatesTable[3], displayedScores[3][1]],
     ]);
 
+    // Calculate streak
+    let streak = 0;
+    for (let i = dayIndex; i >= 0; i--) {
+      if (newGridData[habitIndex].days[i] > 0) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    newGridData[habitIndex].streak = streak;
+
     setGridData(newGridData);
     updateScoresData();
     setShowAddHabit(false);
@@ -520,6 +532,18 @@ const App = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <AppBar position="static" color="transparent" elevation={0}>
           <Toolbar>
+            <img
+              src={extensionIcon}
+              alt="Trackr Icon"
+              style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                width: '48px',
+                height: '48px',
+                zIndex: 1000,
+              }}
+            />
             <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
               {userName}'s Trackr 🚀
             </Typography>
@@ -604,7 +628,6 @@ const App = () => {
         >
           <DialogTitle sx={{
             fontSize: '1.5rem',
-            fontWeight: 'bold',
             paddingBottom: '16px',
           }}>
             Delete Habit
@@ -658,7 +681,7 @@ const App = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: '#faf3e0',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

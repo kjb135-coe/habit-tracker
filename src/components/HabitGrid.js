@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import lottie from 'lottie-web';
 import checkmarkAnimation from '../animations/checkmark_lottie.json';
 import xmarkAnimation from '../animations/xmark_lottie.json';
+import flameAnimation from '../animations/flame_lottie.json';
 
 const LottieCheckmark = () => {
   const animationContainer = useRef(null);
@@ -44,6 +45,26 @@ const LottieXmark = () => {
   return <div ref={animationContainer} style={{ width: '40px', height: '40px', display: 'inline-block' }}></div>;
 };
 
+const LottieFlame = () => {
+  const animationContainer = useRef(null);
+
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: flameAnimation // Ensure this path is correct
+      });
+
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return <div ref={animationContainer} style={{ width: '25px', height: '25px', display: 'inline-block' }}></div>;
+};
+
 const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
   return (
     <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
@@ -59,10 +80,15 @@ const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
         <TableBody>
           {gridData.map((habit, habitIndex) => (
             <TableRow key={habitIndex}>
-              <TableCell component="th" scope="row">{habit.habit}</TableCell>
+              <TableCell component="th" scope="row">
+                {habit.habit}
+                {habit.streak > 0 && (
+                  <LottieFlame/>
+                )}
+              </TableCell>
               {habit.days.map((value, dayIndex) => (
-                <TableCell 
-                  key={dayIndex} 
+                <TableCell
+                  key={dayIndex}
                   align="center"
                   onClick={() => onCellClick(habitIndex, dayIndex)}
                   sx={{
