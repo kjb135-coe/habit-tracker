@@ -545,7 +545,7 @@ const App = () => {
               }}
             />
             <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-              {userName}'s Trackr 🚀
+              {userName}'s Trackr 
             </Typography>
             <IconButton
               color="inherit"

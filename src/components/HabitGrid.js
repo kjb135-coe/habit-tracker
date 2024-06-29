@@ -82,9 +82,9 @@ const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
             <TableRow key={habitIndex}>
               <TableCell component="th" scope="row">
                 {habit.habit}
-                {habit.streak > 0 && (
+                {/* {habit.streak > 0 && (
                   <LottieFlame/>
-                )}
+                )} */}
               </TableCell>
               {habit.days.map((value, dayIndex) => (
                 <TableCell
