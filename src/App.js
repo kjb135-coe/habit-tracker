@@ -2,10 +2,48 @@
 
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
-// import LineChart from './LineChart';
-import StartupPopup from './StartupPopup';
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Paper,
+  IconButton,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem as SelectMenuItem,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+} from '@mui/material';
+import { Snackbar, Alert } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import HabitGrid from './components/HabitGrid';
+import StartupPopup from './components/StartupPopup';
 import lottie from 'lottie-web';
-import { CssBaseline, Container, Typography, Box } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    background: {
+      default: '#faf3e0', // Light beige background
+    },
+  },
+});
+
 
 // #region Animations
 // Lottie checkmark animation
@@ -120,6 +158,13 @@ const App = () => {
     [weekDatesTable[3], 0]
   ]);
   const [prevDay, setPrevDay] = useState(new Date().getDay());
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, habitIndex: null });
 
   //#endregion
 
@@ -316,20 +361,9 @@ const App = () => {
     setIsAddHabitVisible(false);
   };
 
-  const handleAddHabitClick = () => {
-    setIsDropdownVisible(!isDropdownVisible);
-    if (isDropdownVisible) setShowAddHabit(true);
-    else setShowAddHabit(false);
-  };
-
   const handleAddNewHabit = () => {
-    if (newHabitName.trim() === '') {
-      alert('Please enter a habit name.');
-      return;
-    }
-
     if (gridData.length >= 6) {
-      alert('Research shows that it is harder to form many habits at once. Please limit your habits to 6 or less');
+      showSnackbar('Research shows that it is harder to form many habits at once. Please limit your habits to 6 or less.', 'info');
       setShowAddHabit(false);
       setIsAddHabitVisible(false);
       return;
@@ -352,23 +386,7 @@ const App = () => {
     setNewHabitName('');
     setSelectedWCount(selectedWCount);
     setIsAddHabitVisible(false);
-  };
-
-  const toggleAddHabit = () => {
-    setIsAddHabitVisible(!isAddHabitVisible);
-  };
-
-  const handleDeleteHabitClick = () => {
-    setIsDeleteDropdownVisible(!isDeleteDropdownVisible);
-  };
-
-  const handleHabitDelete = (habitIndex) => {
-    if (window.confirm('Are you sure you want to delete this habit?')) {
-      const updatedGridData = [...gridData];
-      updatedGridData.splice(habitIndex, 1); // Remove the habit at the specified index
-      setGridData(updatedGridData);
-      setIsDeleteDropdownVisible(false);
-    }
+    showSnackbar('Habit added successfully.', 'success');
   };
 
   const handleNameSubmit = (name) => {
@@ -377,9 +395,37 @@ const App = () => {
   };
 
   const handlePopupClose = (habitData) => {
-    // setUserHabit(habitData);
+    setGridData([habitData]);
     setShowStartupPopup(false);
     // chrome.storage.sync.set({ userHabit: habitData });
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleConfirmDelete = (habitIndex) => {
+    setConfirmDelete({ open: true, habitIndex });
+  };
+
+  const handleDeleteConfirmed = () => {
+    const updatedGridData = [...gridData];
+    updatedGridData.splice(confirmDelete.habitIndex, 1);
+    setGridData(updatedGridData);
+    setIsDeleteDropdownVisible(false);
+    setConfirmDelete({ open: false, habitIndex: null });
+    showSnackbar('Habit deleted successfully.', 'success');
   };
 
   //#endregion
@@ -427,6 +473,9 @@ const App = () => {
     setGridData(clearedGridData);
   };
 
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ displayedScores, weekDatesTable }) => {
@@ -466,111 +515,175 @@ const App = () => {
 
   //#region Render (HTML)
   return (
-    <Container className="App">
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      {showStartupPopup && (
-        <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
-      )}
-      {!showStartupPopup && (
-        <>
-          <div className="EditButtonContainer">
-            <button className="EditButton" onClick={handleAddHabitClick}></button>
-            {showAddHabit && (
-              <div className="Dropdown">
-                <button onClick={toggleAddHabit}>Add Habit</button>
-                <button className="DeleteButton" onClick={handleDeleteHabitClick}>
-                  Delete Habit
-                </button>
-                {isDeleteDropdownVisible && (
-                  <div className="DeleteDropdown">
-                    {gridData.map((habit, habitIndex) => (
-                      <button
-                        className="DeleteHabitButton"
-                        key={habitIndex}
-                        onClick={() => handleHabitDelete(habitIndex)}
-                      >
-                        {habit.habit}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="GridContainer">
-            <header className="App-header">
-              <h1 className="App-title">{userName}'s Trackr 🚀</h1>
-            </header>
-            <div className="Grid">
-              <div className="GridHeader">
-                <div className="GridCell"></div>
-                {weekDates.map((date, dayIndex) => (
-                  <div key={dayIndex} className="GridCell">{date}</div>
-                ))}
-              </div>
-              {gridData.map((habit, habitIndex) => (
-                <div key={habitIndex} className="GridRow">
-                  <div className="GridCell">{habit.habit}</div>
-                  {habit.days.map((value, dayIndex) => (
-                    <div
-                      key={dayIndex}
-                      className={`GridCell ${value >= 1 && value <= 3 ? 'green' : value === -1 ? 'red' : 'middle'}`}
-                      onClick={() => handleCellClick(habitIndex, dayIndex)}
-                    >
-                      {value >= 1 && value <= 3
-                        ? Array.from({ length: value }, (v, i) => (
-                          <div style={{ width: '22px', height: '22px' }}>
-                            <LottieCheckmark key={i} />
-                          </div>
-                        ))
-                        : value === -1
-                          ?
-                          <div style={{ width: '40px', height: '40px' }}>
-                            <LottieXmark />
-                          </div>
-                          : ''}
-                    </div>
-                  ))}
-                </div>
-              ))}
-              <div className="GridFooter">
-                <div className="GridCell">Score</div>
-                <div className="GridCell GridCellSpan">
-                  <b>{calculateScore()} </b>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="Footer">
-            <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
-            {isAddHabitVisible && (
-              <div className="AddHabitPopup">
-                <input
-                  type="text"
-                  placeholder="New Habit Name"
-                  value={newHabitName}
-                  onChange={(e) => setNewHabitName(e.target.value)}
-                />
-                <select
-                  value={selectedWCount}
-                  onChange={(e) => setSelectedWCount(e.target.value)}
-                >
-                  <option disabled>Enter Max Points</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                </select>
-                <button onClick={handleAddNewHabit}>Add</button>
-              </div>
-            )}
-            <p>&copy; 2024 Trackr v1.0.0</p>
-          </div>
-        </>
-      )}
-    </Container>
-  );
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppBar position="static" color="transparent" elevation={0}>
+          <Toolbar>
+            <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
+              {userName}'s Trackr 🚀
+            </Typography>
+            <IconButton
+              color="inherit"
+              onClick={handleMenuOpen}
+              aria-label="menu"
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
 
-  //#endregion
+        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ width: '70%' }}>
+            <HabitGrid
+              gridData={gridData}
+              weekDates={weekDates}
+              onCellClick={handleCellClick}
+              calculateScore={calculateScore}
+            />
+          </Box>
+        </Box>
+
+
+        <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
+          <Container maxWidth="sm">
+            <Typography variant="body2" color="text.secondary" align="center">
+              © 2024 Trackr v1.0.0
+            </Typography>
+          </Container>
+        </Box>
+
+        <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
+          <DialogTitle>Add New Habit</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="habit-name"
+              label="Habit Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={newHabitName}
+              onChange={(e) => setNewHabitName(e.target.value)}
+            />
+            <Select
+              value={selectedWCount}
+              onChange={(e) => setSelectedWCount(e.target.value)}
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              <SelectMenuItem value={1}>1 point</SelectMenuItem>
+              <SelectMenuItem value={2}>2 points</SelectMenuItem>
+              <SelectMenuItem value={3}>3 points</SelectMenuItem>
+            </Select>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
+            <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={isDeleteDropdownVisible}
+          onClose={() => setIsDeleteDropdownVisible(false)}
+          PaperProps={{
+            style: {
+              borderRadius: '12px',
+              padding: '16px',
+            },
+          }}
+        >
+          <DialogTitle sx={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            paddingBottom: '16px',
+          }}>
+            Delete Habit
+          </DialogTitle>
+          <Divider />
+          <List sx={{
+            width: '100%',
+            minWidth: 250,
+            bgcolor: 'background.paper'
+          }}>
+            {gridData.map((habit, index) => (
+              <ListItem
+                key={index}
+                secondaryAction={
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleConfirmDelete(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                }
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  },
+                }}
+              >
+                <ListItemText
+                  primary={habit.habit}
+                  primaryTypographyProps={{ fontWeight: 'medium' }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Dialog>
+        <Dialog
+          open={confirmDelete.open}
+          onClose={() => setConfirmDelete({ open: false, habitIndex: null })}
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            Are you sure you want to delete this habit?
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDelete({ open: false, habitIndex: null })}>Cancel</Button>
+            <Button onClick={handleDeleteConfirmed} color="error">Delete</Button>
+          </DialogActions>
+        </Dialog>
+
+        {showStartupPopup && (
+          <Box sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+          }}>
+            <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
+          </Box>
+        )}
+
+        <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
+          <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
+        </Box>
+      </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </ThemeProvider>
+  );
 };
 
 export default App;

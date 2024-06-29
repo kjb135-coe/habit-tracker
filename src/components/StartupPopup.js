@@ -17,8 +17,12 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
 
   const handleHabitSubmit = (e) => {
     e.preventDefault();
-    const habitData = { habit, points };
-    onClose(habitData);
+    const newHabit = {
+      habit: habit,
+      days: new Array(7).fill(0),
+      selectedWCount: points,
+    };
+    onClose(newHabit);
   };
 
   const pageVariants = {
