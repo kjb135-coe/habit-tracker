@@ -36,6 +36,8 @@ import HabitGrid from './components/HabitGrid';
 import StartupPopup from './components/StartupPopup';
 import extensionIcon from './extensionIcon.png';
 import WeeklyProgressBar from './components/WeeklyProgressBar';
+import { motion, AnimatePresence } from 'framer-motion';
+import StartupAnimation from './components/StartupAnimation'
 
 const theme = createTheme({
   palette: {
@@ -48,6 +50,11 @@ const theme = createTheme({
     h4: {
       fontFamily: 'Noto Serif, serif',
     },
+    h1: {
+      fontFamily: 'Noto Serif, serif',
+      fontSize: '48px',
+      color: 'black',
+    }
   },
 });
 
@@ -103,7 +110,7 @@ const App = () => {
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [scoresData, setScoresData] = useState([]);
   const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
-  const [showStartupPopup, setShowStartupPopup] = useState(true);
+  const [showStartupPopup, setShowStartupPopup] = useState(false);
   const [userName, setUserName] = useState('');
   const [displayedScores, setDisplayedScores] = useState([
     [weekDatesTable[0], 0],
@@ -122,6 +129,7 @@ const App = () => {
   const [weeklyGoal, setWeeklyGoal] = useState('');
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
+  const [animationState, setAnimationState] = useState('initial');
 
   //#endregion
 
@@ -276,6 +284,18 @@ const App = () => {
     // Update the previous day to current day for the next check
     setPrevDay(currentDay);
   }, [prevDay, startDate, weekDates, scoresData, displayedScores, gridData, weekDatesTable]);
+
+  // Startup Animation
+  useEffect(() => {
+    const sequence = async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Show for 2 seconds
+      setAnimationState('exiting');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Exit animation duration
+      setAnimationState('completed');
+      setShowStartupPopup(true);
+    };
+    sequence();
+  }, []);
 
   //#endregion
 
@@ -476,7 +496,6 @@ const App = () => {
 
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ displayedScores, weekDatesTable }) => {
-
     return (
       <div className="SubmittedScores">
         <table>
@@ -514,209 +533,208 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <AppBar position="static" color="transparent" elevation={0}>
-          <Toolbar>
-            <img
-              src={extensionIcon}
-              alt="Trackr Icon"
-              style={{
-                position: 'absolute',
-                top: '5px',
-                left: '5px',
-                width: '48px',
-                height: '48px',
-                zIndex: 1000,
-              }}
-            />
-            <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-              {userName}'s Trackr
-            </Typography>
-            <IconButton
-              color="inherit"
-              onClick={handleMenuOpen}
-              aria-label="menu"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
-              <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
-              <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); }}>Set Weekly Goal</MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
-        <Box sx={{ width: '70%', margin: '0 auto', mt: 2 }}>
-          <WeeklyProgressBar currentScore={calculateScore()} weeklyGoal={weeklyGoalCheck()} />
-        </Box>
-
-        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
-          <Box sx={{ width: '70%' }}>
-            <HabitGrid
-              gridData={gridData}
-              weekDates={weekDates}
-              onCellClick={handleCellClick}
-              calculateScore={calculateScore}
-            />
-          </Box>
-        </Box>
-
-
-        <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
-          <Container maxWidth="sm">
-            <Typography variant="body2" color="text.secondary" align="center">
-              © 2024 Trackr v1.0.0
-            </Typography>
-          </Container>
-        </Box>
-
-        <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
-          <DialogTitle>Add New Habit</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="habit-name"
-              label="Habit Name"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={newHabitName}
-              onChange={(e) => setNewHabitName(e.target.value)}
-            />
-            <Select
-              value={selectedWCount}
-              onChange={(e) => setSelectedWCount(e.target.value)}
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              <SelectMenuItem value={1}>1 point</SelectMenuItem>
-              <SelectMenuItem value={2}>2 points</SelectMenuItem>
-              <SelectMenuItem value={3}>3 points</SelectMenuItem>
-            </Select>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
-            <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={isDeleteDropdownVisible}
-          onClose={() => setIsDeleteDropdownVisible(false)}
-          PaperProps={{
-            style: {
-              borderRadius: '12px',
-              padding: '16px',
-            },
-          }}
-        >
-          <DialogTitle sx={{
-            fontSize: '1.5rem',
-            paddingBottom: '16px',
-          }}>
-            Delete Habit
-          </DialogTitle>
-          <Divider />
-          <List sx={{
-            width: '100%',
-            minWidth: 250,
-            bgcolor: 'background.paper'
-          }}>
-            {gridData.map((habit, index) => (
-              <ListItem
-                key={index}
-                secondaryAction={
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleConfirmDelete(index)}>
-                    <DeleteIcon />
-                  </IconButton>
-                }
-                sx={{
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  },
-                }}
-              >
-                <ListItemText
-                  primary={habit.habit}
-                  primaryTypographyProps={{ fontWeight: 'medium' }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Dialog>
-        <Dialog
-          open={confirmDelete.open}
-          onClose={() => setConfirmDelete({ open: false, habitIndex: null })}
-        >
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogContent>
-            Are you sure you want to delete this habit?
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConfirmDelete({ open: false, habitIndex: null })}>Cancel</Button>
-            <Button onClick={handleDeleteConfirmed} color="error">Delete</Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog open={openGoalDialog} onClose={() => setOpenGoalDialog(false)}>
-          <DialogTitle>Set Weekly Goal</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="weekly-goal"
-              label="Weekly Goal"
-              type="number"
-              fullWidth
-              variant="standard"
-              value={tempWeeklyGoal}
-              onChange={(e) => setTempWeeklyGoal(Math.max(0, parseInt(e.target.value) || 0))}
-            />
-            <Typography variant="caption" color="textSecondary">
-              Maximum achievable score: {calculateMaxScore()}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenGoalDialog(false)}>Cancel</Button>
-            <Button onClick={handleSetWeeklyGoal}>Set Goal</Button>
-          </DialogActions>
-        </Dialog>
-        {showStartupPopup && (
-          <Box sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#faf3e0',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-          }}>
-            <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
-          </Box>
+      <AnimatePresence>
+        {animationState !== 'completed' && (
+          <StartupAnimation animationState={animationState} />
         )}
+      </AnimatePresence>
+      {animationState === 'completed' && (
+      <><Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <AppBar position="static" color="transparent" elevation={0}>
+            <Toolbar>
+              <img
+                src={extensionIcon}
+                alt="Trackr Icon"
+                style={{
+                  position: 'absolute',
+                  top: '5px',
+                  left: '5px',
+                  width: '48px',
+                  height: '48px',
+                  zIndex: 1000,
+                }} />
+              <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
+                {userName}'s Trackr
+              </Typography>
+              <IconButton
+                color="inherit"
+                onClick={handleMenuOpen}
+                aria-label="menu"
+              >
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); } }>Add Habit</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); } }>Delete Habit</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); } }>Set Weekly Goal</MenuItem>
+              </Menu>
+            </Toolbar>
+          </AppBar>
+          <Box sx={{ width: '70%', margin: '0 auto', mt: 2 }}>
+            <WeeklyProgressBar currentScore={calculateScore()} weeklyGoal={weeklyGoalCheck()} />
+          </Box>
 
-        <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
-          <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
-        </Box>
-      </Box>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ width: '70%' }}>
+              <HabitGrid
+                gridData={gridData}
+                weekDates={weekDates}
+                onCellClick={handleCellClick}
+                calculateScore={calculateScore} />
+            </Box>
+          </Box>
+
+
+          <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
+            <Container maxWidth="sm">
+              <Typography variant="body2" color="text.secondary" align="center">
+                © 2024 Trackr v1.0.0
+              </Typography>
+            </Container>
+          </Box>
+
+          <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
+            <DialogTitle>Add New Habit</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="habit-name"
+                label="Habit Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                value={newHabitName}
+                onChange={(e) => setNewHabitName(e.target.value)} />
+              <Select
+                value={selectedWCount}
+                onChange={(e) => setSelectedWCount(e.target.value)}
+                fullWidth
+                sx={{ mt: 2 }}
+              >
+                <SelectMenuItem value={1}>1 point</SelectMenuItem>
+                <SelectMenuItem value={2}>2 points</SelectMenuItem>
+                <SelectMenuItem value={3}>3 points</SelectMenuItem>
+              </Select>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
+              <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={isDeleteDropdownVisible}
+            onClose={() => setIsDeleteDropdownVisible(false)}
+            PaperProps={{
+              style: {
+                borderRadius: '12px',
+                padding: '16px',
+              },
+            }}
+          >
+            <DialogTitle sx={{
+              fontSize: '1.5rem',
+              paddingBottom: '16px',
+            }}>
+              Delete Habit
+            </DialogTitle>
+            <Divider />
+            <List sx={{
+              width: '100%',
+              minWidth: 250,
+              bgcolor: 'background.paper'
+            }}>
+              {gridData.map((habit, index) => (
+                <ListItem
+                  key={index}
+                  secondaryAction={<IconButton edge="end" aria-label="delete" onClick={() => handleConfirmDelete(index)}>
+                    <DeleteIcon />
+                  </IconButton>}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={habit.habit}
+                    primaryTypographyProps={{ fontWeight: 'medium' }} />
+                </ListItem>
+              ))}
+            </List>
+          </Dialog>
+          <Dialog
+            open={confirmDelete.open}
+            onClose={() => setConfirmDelete({ open: false, habitIndex: null })}
+          >
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogContent>
+              Are you sure you want to delete this habit?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setConfirmDelete({ open: false, habitIndex: null })}>Cancel</Button>
+              <Button onClick={handleDeleteConfirmed} color="error">Delete</Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog open={openGoalDialog} onClose={() => setOpenGoalDialog(false)}>
+            <DialogTitle>Set Weekly Goal</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="weekly-goal"
+                label="Weekly Goal"
+                type="number"
+                fullWidth
+                variant="standard"
+                value={tempWeeklyGoal}
+                onChange={(e) => setTempWeeklyGoal(Math.max(0, parseInt(e.target.value) || 0))} />
+              <Typography variant="caption" color="textSecondary">
+                Maximum achievable score: {calculateMaxScore()}
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenGoalDialog(false)}>Cancel</Button>
+              <Button onClick={handleSetWeeklyGoal}>Set Goal</Button>
+            </DialogActions>
+          </Dialog>
+          {showStartupPopup && (
+            <Box sx={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#faf3e0',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 9999,
+            }}>
+              <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
+            </Box>
+          )}
+
+          <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
+            <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
+          </Box>
+        </Box><Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+            <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+              {snackbar.message}
+            </Alert>
+          </Snackbar></>
+      )}
     </ThemeProvider>
   );
 };
