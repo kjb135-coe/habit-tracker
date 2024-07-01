@@ -35,68 +35,21 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import HabitGrid from './components/HabitGrid';
 import StartupPopup from './components/StartupPopup';
 import extensionIcon from './extensionIcon.png';
-import lottie from 'lottie-web';
+import WeeklyProgressBar from './components/WeeklyProgressBar';
 
 const theme = createTheme({
   palette: {
     background: {
-      default: '#faf3e0', // Light beige background
+      default: '#ffffff', // Light beige background
+    },
+  },
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
+    h4: {
+      fontFamily: 'Noto Serif, serif',
     },
   },
 });
-
-
-// #region Animations
-// Lottie checkmark animation
-const LottieCheckmark = () => {
-  const animationContainer = useRef(null);
-
-  useEffect(() => {
-    if (animationContainer.current) {
-      const anim = lottie.loadAnimation({
-        container: animationContainer.current,
-        renderer: 'svg',
-        loop: false,
-        autoplay: true,
-        style: { height: '22px', width: '22px' },
-        rendererSettings: {
-          preserveAspectRatio: 'xMidYMid slice',
-        },
-        path: 'C:/Users/keega/React/habit-tracker/src/checkmark_lottie.json' // Ensure the path is correct and accessible
-      });
-
-      return () => anim.destroy();
-    }
-  }, []);
-
-  return <div ref={animationContainer} ></div>;
-};
-
-// Lottie xmark animation
-const LottieXmark = () => {
-  const animationContainer = useRef(null);
-
-  useEffect(() => {
-    if (animationContainer.current) {
-      const anim = lottie.loadAnimation({
-        container: animationContainer.current,
-        renderer: 'svg',
-        loop: false,
-        autoplay: true,
-        style: { height: '22px', width: '22px' },
-        rendererSettings: {
-          preserveAspectRatio: 'xMidYMid slice',
-        },
-        path: 'C:/Users/keega/React/habit-tracker/src/xmark_lottie.json' // Ensure the path is correct and accessible
-      });
-
-      return () => anim.destroy();
-    }
-  }, []);
-
-  return <div ref={animationContainer}></div>;
-};
-// #endregion
 
 const App = () => {
 
@@ -166,6 +119,9 @@ const App = () => {
     severity: 'info'
   });
   const [confirmDelete, setConfirmDelete] = useState({ open: false, habitIndex: null });
+  const [weeklyGoal, setWeeklyGoal] = useState('');
+  const [openGoalDialog, setOpenGoalDialog] = useState(false);
+  const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
 
   //#endregion
 
@@ -435,9 +391,21 @@ const App = () => {
     const updatedGridData = [...gridData];
     updatedGridData.splice(confirmDelete.habitIndex, 1);
     setGridData(updatedGridData);
+
     setIsDeleteDropdownVisible(false);
     setConfirmDelete({ open: false, habitIndex: null });
     showSnackbar('Habit deleted successfully.', 'success');
+  };
+
+  const handleSetWeeklyGoal = () => {
+    const maxScore = calculateMaxScore();
+    if (tempWeeklyGoal > maxScore) {
+      showSnackbar(`The maximum achievable score is ${maxScore}. Please enter a lower goal.`, 'warning');
+    } else {
+      setWeeklyGoal(tempWeeklyGoal);
+      setOpenGoalDialog(false);
+      showSnackbar('Weekly goal set successfully!', 'success');
+    }
   };
 
   //#endregion
@@ -469,10 +437,17 @@ const App = () => {
     let score = 0;
     gridData.forEach((habit) => {
       habit.days.forEach((value) => {
-        if (value != -1) score += value;
+        if (value !== -1) score += value;
       });
     });
     return score;
+  };
+
+  const calculateMaxScore = () => {
+    return gridData.reduce((total, habit) => {
+      const maxPointsPerDay = habit.selectedWCount || 0;
+      return total + (maxPointsPerDay * 7);
+    }, 0);
   };
 
   // Function to clear the grid data for new week
@@ -487,6 +462,16 @@ const App = () => {
 
   const showSnackbar = (message, severity = 'info') => {
     setSnackbar({ open: true, message, severity });
+  };
+
+  const weeklyGoalCheck = () => {
+    const newMaxScore = calculateMaxScore();
+    if (weeklyGoal > newMaxScore) {
+      setWeeklyGoal(newMaxScore);
+      showSnackbar(`Weekly goal adjusted to ${newMaxScore} due to the new maximum achievable score.`, 'info');
+      return newMaxScore;
+    }
+    else return weeklyGoal;
   };
 
   // Component to display the submitted scores
@@ -537,15 +522,15 @@ const App = () => {
               alt="Trackr Icon"
               style={{
                 position: 'absolute',
-                top: '10px',
-                left: '10px',
+                top: '5px',
+                left: '5px',
                 width: '48px',
                 height: '48px',
                 zIndex: 1000,
               }}
             />
             <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-              {userName}'s Trackr 
+              {userName}'s Trackr
             </Typography>
             <IconButton
               color="inherit"
@@ -561,9 +546,13 @@ const App = () => {
             >
               <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
               <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); }}>Set Weekly Goal</MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>
+        <Box sx={{ width: '70%', margin: '0 auto', mt: 2 }}>
+          <WeeklyProgressBar currentScore={calculateScore()} weeklyGoal={weeklyGoalCheck()} />
+        </Box>
 
         <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ width: '70%' }}>
@@ -674,6 +663,29 @@ const App = () => {
           </DialogActions>
         </Dialog>
 
+        <Dialog open={openGoalDialog} onClose={() => setOpenGoalDialog(false)}>
+          <DialogTitle>Set Weekly Goal</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="weekly-goal"
+              label="Weekly Goal"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={tempWeeklyGoal}
+              onChange={(e) => setTempWeeklyGoal(Math.max(0, parseInt(e.target.value) || 0))}
+            />
+            <Typography variant="caption" color="textSecondary">
+              Maximum achievable score: {calculateMaxScore()}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenGoalDialog(false)}>Cancel</Button>
+            <Button onClick={handleSetWeeklyGoal}>Set Goal</Button>
+          </DialogActions>
+        </Dialog>
         {showStartupPopup && (
           <Box sx={{
             position: 'fixed',

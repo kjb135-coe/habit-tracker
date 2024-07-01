@@ -5,6 +5,7 @@ import checkmarkAnimation from '../animations/checkmark_lottie.json';
 import xmarkAnimation from '../animations/xmark_lottie.json';
 import flameAnimation from '../animations/flame_lottie.json';
 
+//#region Animations
 const LottieCheckmark = () => {
   const animationContainer = useRef(null);
 
@@ -64,6 +65,7 @@ const LottieFlame = () => {
 
   return <div ref={animationContainer} style={{ width: '25px', height: '25px', display: 'inline-block' }}></div>;
 };
+//#endregion
 
 const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
   return (
