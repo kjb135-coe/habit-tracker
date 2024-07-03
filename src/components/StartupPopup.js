@@ -4,13 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
 
 const StartupPopup = ({ onClose, onNameSubmit }) => {
-  const [view, setView] = useState(0); // Start with 0 for the animation
+  const [view, setView] = useState(0);
   const [name, setName] = useState('');
   const [habit, setHabit] = useState('');
   const [points, setPoints] = useState(1);
 
   useEffect(() => {
-    // Automatically move to the next view after 5 seconds
     const timer = setTimeout(() => {
       setView(1);
     }, 5000);
@@ -34,46 +33,29 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
     onClose(newHabit);
   };
 
-  const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    in: { opacity: 1, y: 0 },
-    out: { opacity: 0, y: -20 }
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0, transition: { duration: 0.5 } }
   };
 
-  const pageTransition = {
-    type: 'tween',
-    ease: 'anticipate',
-    duration: 0.5
+  const contentVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
   };
 
   const renderView = (currentView) => {
     switch (currentView) {
       case 0:
         return (
-          <motion.div
-            key={0}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-          >
-            <Typography variant="h1" style={{ fontFamily: 'Noto Serif, serif', fontSize: '48px' }}>
-              Trackr
-            </Typography>
-          </motion.div>
+          <Typography variant="h1" style={{ fontFamily: 'Noto Serif, serif', fontSize: '48px' }}>
+            Trackr
+          </Typography>
         );
       case 1:
         return (
-          <motion.form
-            key={1}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            onSubmit={handleNameSubmit}
-          >
+          <form onSubmit={handleNameSubmit}>
             <Typography variant="h5">Welcome to Trackr!</Typography>
             <TextField
               label="Your Name"
@@ -91,22 +73,14 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             >
               Continue
             </Button>
-          </motion.form>
+          </form>
         );
       case 2:
         return (
-          <motion.form
-            key={2}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            onSubmit={(e) => {
-              e.preventDefault();
-              setView(3);
-            }}
-          >
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            setView(3);
+          }}>
             <Typography variant="h5">How to Add Habits</Typography>
             <ul>
               <li>Enter the name of the habit.</li>
@@ -120,19 +94,11 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             >
               Continue
             </Button>
-          </motion.form>
+          </form>
         );
       case 3:
         return (
-          <motion.form
-            key={3}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            onSubmit={handleHabitSubmit}
-          >
+          <form onSubmit={handleHabitSubmit}>
             <Typography variant="h5">Add Your First Habit</Typography>
             <TextField
               label="Habit Name"
@@ -160,7 +126,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             >
               Add Habit
             </Button>
-          </motion.form>
+          </form>
         );
       default:
         return null;
@@ -168,15 +134,30 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
   };
 
   return (
-    <div className="fullScreenOverlay">
-      <div className="popupContainer">
+    <motion.div
+      className="fullScreenOverlay"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <motion.div className="popupContainer">
         <div className="StartupPopup">
           <AnimatePresence mode="wait">
-            {renderView(view)}
+            <motion.div
+              key={view}
+              variants={contentVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.5 }}
+            >
+              {renderView(view)}
+            </motion.div>
           </AnimatePresence>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
