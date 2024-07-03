@@ -110,7 +110,7 @@ const App = () => {
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
   const [scoresData, setScoresData] = useState([]);
   const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
-  const [showStartupPopup, setShowStartupPopup] = useState(false);
+  const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('');
   const [displayedScores, setDisplayedScores] = useState([
     [weekDatesTable[0], 0],
@@ -129,124 +129,119 @@ const App = () => {
   const [weeklyGoal, setWeeklyGoal] = useState('');
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
-  const [animationState, setAnimationState] = useState('initial');
 
   //#endregion
 
   //#region Hooks
-  // useEffect(() => {
-  //   chrome.storage.sync.get(['userName', 'userHabit'], (result) => {
-  //     if (result.userName) {
-  //       setUserName(result.userName);
-  //       setShowStartupPopup(false);
-  //     }
-  //     if (result.userHabit) {
-  //       setUserHabit(result.userHabit);
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    chrome.storage.sync.get(['startupPopupShown'], (result) => {
+      if (result.startupPopupShown) {
+        setShowStartupPopup(false);
+      }
+    });
+  }, []);
 
   // Communcation for background/content workers
   // Triggerred whenever any of the states listed are changed
   // Chrome only allows 120 requests per minute, so this is a workaround
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     // Store the state in memory using chrome.storage.sync
-  //     chrome.storage.sync.set({
-  //       state: {
-  //         gridData,
-  //         showAddHabit,
-  //         newHabitName,
-  //         selectedWCount,
-  //         isDropdownVisible,
-  //         isAddHabitVisible,
-  //         isDeleteDropdownVisible,
-  //         scoresData,
-  //         weekDates,
-  //         showStartupPopup,
-  //         userName,
-  //         weekDatesTable,
-  //         displayedScores,
-  //         prevDay
-  //       }
-  //     });
-  //   }, 660);
-  //   // Clean up the interval when the component unmounts
-  //   return () => clearInterval(interval);
-  // }, [
-  //   gridData,
-  //   showAddHabit,
-  //   newHabitName,
-  //   selectedWCount,
-  //   isDropdownVisible,
-  //   isAddHabitVisible,
-  //   isDeleteDropdownVisible,
-  //   scoresData,
-  //   weekDates,
-  //   showStartupPopup,
-  //   userName,
-  //   weekDatesTable,
-  //   displayedScores,
-  //   prevDay
-  // ]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Store the state in memory using chrome.storage.sync
+      chrome.storage.sync.set({
+        state: {
+          gridData,
+          showAddHabit,
+          newHabitName,
+          selectedWCount,
+          isDropdownVisible,
+          isAddHabitVisible,
+          isDeleteDropdownVisible,
+          scoresData,
+          weekDates,
+          showStartupPopup,
+          userName,
+          weekDatesTable,
+          displayedScores,
+          prevDay
+        }
+      });
+    }, 660);
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, [
+    gridData,
+    showAddHabit,
+    newHabitName,
+    selectedWCount,
+    isDropdownVisible,
+    isAddHabitVisible,
+    isDeleteDropdownVisible,
+    scoresData,
+    weekDates,
+    showStartupPopup,
+    userName,
+    weekDatesTable,
+    displayedScores,
+    prevDay
+  ]);
 
-  // // Listen for messages from the content script
-  // useEffect(() => {
-  //   function handleMessage(event) {
-  //     // Only trust messages from the same frame
-  //     if (event.source !== window) return;
+  // Listen for messages from the content script
+  useEffect(() => {
+    function handleMessage(event) {
+      // Only trust messages from the same frame
+      if (event.source !== window) return;
 
-  //     const message = event.data;
+      const message = event.data;
 
-  //     // Make sure the message has the correct format
-  //     if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
-  //       const payload = message.payload;
+      // Make sure the message has the correct format
+      if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
+        const payload = message.payload;
 
-  //       // Check the payload type
-  //       if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
-  //         // A new tab was created, update the state
-  //         setGridData(payload.gridData);
-  //         setShowAddHabit(payload.showAddHabit);
-  //         setNewHabitName(payload.newHabitName);
-  //         setSelectedWCount(payload.selectedWCount);
-  //         setIsDropdownVisible(payload.isDropdownVisible);
-  //         setIsAddHabitVisible(payload.isAddHabitVisible);
-  //         setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-  //         setScoresData(payload.scoresData);
-  //         setWeekDates(payload.weekDates);
-  //         setShowStartupPopup(payload.showStartupPopup);
-  //         setUserName(payload.userName);
-  //         setWeekDatesTable(payload.weekDatesTable);
-  //         setDisplayedScores(payload.displayedScores);
-  //         setPrevDay(payload.prevDay);
-  //       } else if (payload) {
-  //         // Handle other messages
-  //         setGridData(payload.gridData);
-  //         setShowAddHabit(payload.showAddHabit);
-  //         setNewHabitName(payload.newHabitName);
-  //         setSelectedWCount(payload.selectedWCount);
-  //         setIsDropdownVisible(payload.isDropdownVisible);
-  //         setIsAddHabitVisible(payload.isAddHabitVisible);
-  //         setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-  //         setScoresData(payload.scoresData);
-  //         setWeekDates(payload.weekDates);
-  //         setShowStartupPopup(payload.showStartupPopup);
-  //         setUserName(payload.userName);
-  //         setWeekDatesTable(payload.weekDatesTable);
-  //         setDisplayedScores(payload.displayedScores);
-  //         setPrevDay(payload.prevDay);
-  //       }
-  //     }
-  //   }
+        // Check the payload type
+        if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
+          // A new tab was created, update the state
+          setGridData(payload.gridData);
+          setShowAddHabit(payload.showAddHabit);
+          setNewHabitName(payload.newHabitName);
+          setSelectedWCount(payload.selectedWCount);
+          setIsDropdownVisible(payload.isDropdownVisible);
+          setIsAddHabitVisible(payload.isAddHabitVisible);
+          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+          setScoresData(payload.scoresData);
+          setWeekDates(payload.weekDates);
+          setShowStartupPopup(payload.showStartupPopup);
+          setUserName(payload.userName);
+          setWeekDatesTable(payload.weekDatesTable);
+          setDisplayedScores(payload.displayedScores);
+          setPrevDay(payload.prevDay);
+        } else if (payload) {
+          // Handle other messages
+          setGridData(payload.gridData);
+          setShowAddHabit(payload.showAddHabit);
+          setNewHabitName(payload.newHabitName);
+          setSelectedWCount(payload.selectedWCount);
+          setIsDropdownVisible(payload.isDropdownVisible);
+          setIsAddHabitVisible(payload.isAddHabitVisible);
+          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
+          setScoresData(payload.scoresData);
+          setWeekDates(payload.weekDates);
+          setShowStartupPopup(payload.showStartupPopup);
+          setUserName(payload.userName);
+          setWeekDatesTable(payload.weekDatesTable);
+          setDisplayedScores(payload.displayedScores);
+          setPrevDay(payload.prevDay);
+        }
+      }
+    }
 
-  //   // Add event listener for messages
-  //   window.addEventListener('message', handleMessage);
+    // Add event listener for messages
+    window.addEventListener('message', handleMessage);
 
-  //   // Make sure to clean up event listeners when the component unmounts
-  //   return () => {
-  //     window.removeEventListener('message', handleMessage);
-  //   };
-  // }, []);
+    // Make sure to clean up event listeners when the component unmounts
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   // Check for new week
   useEffect(() => {
@@ -284,18 +279,6 @@ const App = () => {
     // Update the previous day to current day for the next check
     setPrevDay(currentDay);
   }, [prevDay, startDate, weekDates, scoresData, displayedScores, gridData, weekDatesTable]);
-
-  // Startup Animation
-  useEffect(() => {
-    const sequence = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Show for 2 seconds
-      setAnimationState('exiting');
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Exit animation duration
-      setAnimationState('completed');
-      setShowStartupPopup(true);
-    };
-    sequence();
-  }, []);
 
   //#endregion
 
@@ -385,7 +368,7 @@ const App = () => {
   const handlePopupClose = (habitData) => {
     setGridData([habitData]);
     setShowStartupPopup(false);
-    // chrome.storage.sync.set({ userHabit: habitData });
+    chrome.storage.sync.set({ startupPopupShown: true });
   };
 
   const handleMenuOpen = (event) => {
@@ -533,13 +516,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AnimatePresence>
-        {animationState !== 'completed' && (
-          <StartupAnimation animationState={animationState} />
-        )}
-      </AnimatePresence>
-      {animationState === 'completed' && (
-      <><Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <><Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <AppBar position="static" color="transparent" elevation={0}>
             <Toolbar>
               <img
@@ -568,9 +545,9 @@ const App = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
-                <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); } }>Add Habit</MenuItem>
-                <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); } }>Delete Habit</MenuItem>
-                <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); } }>Set Weekly Goal</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); }}>Set Weekly Goal</MenuItem>
               </Menu>
             </Toolbar>
           </AppBar>
@@ -705,20 +682,7 @@ const App = () => {
             </DialogActions>
           </Dialog>
           {showStartupPopup && (
-            <Box sx={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: '#faf3e0',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 9999,
-            }}>
-              <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
-            </Box>
+            <StartupPopup onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
           )}
 
           <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
@@ -734,7 +698,6 @@ const App = () => {
               {snackbar.message}
             </Alert>
           </Snackbar></>
-      )}
     </ThemeProvider>
   );
 };

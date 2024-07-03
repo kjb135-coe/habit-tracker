@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
 
 const StartupPopup = ({ onClose, onNameSubmit }) => {
-  const [view, setView] = useState(1);
+  const [view, setView] = useState(0); // Start with 0 for the animation
   const [name, setName] = useState('');
   const [habit, setHabit] = useState('');
   const [points, setPoints] = useState(1);
+
+  useEffect(() => {
+    // Automatically move to the next view after 5 seconds
+    const timer = setTimeout(() => {
+      setView(1);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -26,9 +35,9 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
   };
 
   const pageVariants = {
-    initial: { opacity: 0, x: 100 },
-    in: { opacity: 1, x: 0 },
-    out: { opacity: 0, x: -100 }
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
   };
 
   const pageTransition = {
@@ -39,6 +48,21 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
 
   const renderView = (currentView) => {
     switch (currentView) {
+      case 0:
+        return (
+          <motion.div
+            key={0}
+            initial="initial"
+            animate="in"
+            exit="out"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <Typography variant="h1" style={{ fontFamily: 'Noto Serif, serif', fontSize: '48px' }}>
+              Trackr
+            </Typography>
+          </motion.div>
+        );
       case 1:
         return (
           <motion.form
@@ -50,7 +74,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             transition={pageTransition}
             onSubmit={handleNameSubmit}
           >
-            <Typography variant="h4">Welcome to Trackr!</Typography>
+            <Typography variant="h5">Welcome to Trackr!</Typography>
             <TextField
               label="Your Name"
               variant="outlined"
