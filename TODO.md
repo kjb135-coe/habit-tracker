@@ -17,3 +17,9 @@
 - grid should clear and save score when week changes
 - account for different time zones
 
+
+- set character limit for adding habit
+- add reset feature
+- include hideaway feature for submitted scores table
+- weekly progress doesnt immeditaely sinc
+- submitted scores table doesnt immediately sync when delete habit

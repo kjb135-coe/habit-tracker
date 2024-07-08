@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Box } from '@mui/material';
+import { TextField, Button, Typography, Snackbar, Alert, Box } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
 
@@ -8,6 +8,8 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
   const [name, setName] = useState('');
   const [habit, setHabit] = useState('');
   const [points, setPoints] = useState(1);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'warning' });
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -31,6 +33,26 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
       selectedWCount: points,
     };
     onClose(newHabit);
+  };
+
+  const handleHabitChange = (e) => {
+    const newHabit = e.target.value;
+    if (newHabit.length <= 25) {
+      setHabit(newHabit);
+    } else {
+      setSnackbar({
+        open: true,
+        message: 'Habit name must be 25 characters or less',
+        severity: 'warning'
+      });
+    }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const containerVariants = {
@@ -104,9 +126,11 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               label="Habit Name"
               variant="outlined"
               value={habit}
-              onChange={(e) => setHabit(e.target.value)}
+              onChange={handleHabitChange}
               fullWidth
               margin="normal"
+              inputProps={{ maxLength: 25 }}
+              helperText={`${habit.length}/25`}
             />
             <TextField
               label="Max Points per Day"
@@ -157,6 +181,16 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
           </AnimatePresence>
         </div>
       </motion.div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </motion.div>
   );
 };

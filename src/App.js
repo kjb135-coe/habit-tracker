@@ -128,6 +128,7 @@ const App = () => {
   const [weeklyGoal, setWeeklyGoal] = useState('');
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
 
   //#endregion
 
@@ -161,7 +162,14 @@ const App = () => {
           userName,
           weekDatesTable,
           displayedScores,
-          prevDay
+          prevDay,
+          anchorEl,
+          snackbar,
+          confirmDelete,
+          weeklyGoal,
+          openGoalDialog,
+          tempWeeklyGoal,
+          resetConfirmOpen
         }
       });
     }, 660);
@@ -181,7 +189,14 @@ const App = () => {
     userName,
     weekDatesTable,
     displayedScores,
-    prevDay
+    prevDay,
+    anchorEl,
+    snackbar,
+    confirmDelete,
+    weeklyGoal,
+    openGoalDialog,
+    tempWeeklyGoal,
+    resetConfirmOpen
   ]);
 
   // Listen for messages from the content script
@@ -213,6 +228,13 @@ const App = () => {
           setWeekDatesTable(payload.weekDatesTable);
           setDisplayedScores(payload.displayedScores);
           setPrevDay(payload.prevDay);
+          setAnchorEl(payload.anchorEl);
+          setSnackbar(payload.snackbar);
+          setConfirmDelete(payload.confirmDelete);
+          setWeeklyGoal(payload.weeklyGoal);
+          setOpenGoalDialog(payload.openGoalDialog);
+          setTempWeeklyGoal(payload.tempWeeklyGoal);
+          setResetConfirmOpen(payload.resetConfirmOpen);
         } else if (payload) {
           // Handle other messages
           setGridData(payload.gridData);
@@ -229,6 +251,13 @@ const App = () => {
           setWeekDatesTable(payload.weekDatesTable);
           setDisplayedScores(payload.displayedScores);
           setPrevDay(payload.prevDay);
+          setAnchorEl(payload.anchorEl);
+          setSnackbar(payload.snackbar);
+          setConfirmDelete(payload.confirmDelete);
+          setWeeklyGoal(payload.weeklyGoal);
+          setOpenGoalDialog(payload.openGoalDialog);
+          setTempWeeklyGoal(payload.tempWeeklyGoal);
+          setResetConfirmOpen(payload.resetConfirmOpen);
         }
       }
     }
@@ -339,6 +368,11 @@ const App = () => {
       return;
     }
 
+    if (newHabitName.length > 25) {
+      showSnackbar('Habit name must be 25 characters or less', 'warning');
+      return;
+    }
+
     const newHabit = {
       habit: newHabitName,
       days: new Array(7).fill(0),
@@ -408,6 +442,34 @@ const App = () => {
       setOpenGoalDialog(false);
       showSnackbar('Weekly goal set successfully!', 'success');
     }
+  };
+
+  const handleReset = () => {
+    // Clear all data
+    setGridData([]);
+    setUserName('');
+    setWeeklyGoal('');
+    setDisplayedScores([
+      [weekDatesTable[0], 0],
+      [weekDatesTable[1], 0],
+      [weekDatesTable[2], 0],
+      [weekDatesTable[3], 0]
+    ]);
+
+    // Clear chrome storage
+    chrome.storage.sync.clear(() => {
+      console.log('Chrome storage cleared');
+    });
+
+    // Show startup popup again
+    setShowStartupPopup(true);
+
+    // Close the menu and reset dialog
+    handleMenuClose();
+    setResetConfirmOpen(false);
+
+    // Show a snackbar message
+    showSnackbar('Trackr has been reset successfully', 'success');
   };
 
   //#endregion
@@ -559,13 +621,19 @@ const App = () => {
                     <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
                     <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
                     <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); }}>Set Weekly Goal</MenuItem>
+                    <MenuItem
+                      onClick={() => { handleMenuClose(); setResetConfirmOpen(true); }}
+                      sx={{ color: 'red' }}
+                    >
+                      Reset Trackr
+                    </MenuItem>
                   </Menu>
                 </Toolbar>
               </AppBar>
               <Box sx={{ width: '70%', margin: '0 auto', mt: 2 }}>
                 <WeeklyProgressBar currentScore={calculateScore()} weeklyGoal={weeklyGoalCheck()} />
               </Box>
-  
+
               <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ width: '70%' }}>
                   <HabitGrid
@@ -576,7 +644,7 @@ const App = () => {
                   />
                 </Box>
               </Box>
-  
+
               <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
                 <Container maxWidth="sm">
                   <Typography variant="body2" color="text.secondary" align="center">
@@ -584,7 +652,7 @@ const App = () => {
                   </Typography>
                 </Container>
               </Box>
-  
+
               <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
                 <DialogTitle>Add New Habit</DialogTitle>
                 <DialogContent>
@@ -597,7 +665,15 @@ const App = () => {
                     fullWidth
                     variant="standard"
                     value={newHabitName}
-                    onChange={(e) => setNewHabitName(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 25) {
+                        setNewHabitName(e.target.value);
+                      } else {
+                        showSnackbar('Habit name must be 25 characters or less.', 'warning');
+                      }
+                    }}
+                    inputProps={{ maxLength: 25 }}
+                    helperText={`${newHabitName.length}/25`}
                   />
                   <Select
                     value={selectedWCount}
@@ -615,7 +691,7 @@ const App = () => {
                   <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
                 </DialogActions>
               </Dialog>
-  
+
               <Dialog
                 open={isDeleteDropdownVisible}
                 onClose={() => setIsDeleteDropdownVisible(false)}
@@ -673,7 +749,7 @@ const App = () => {
                   <Button onClick={handleDeleteConfirmed} color="error">Delete</Button>
                 </DialogActions>
               </Dialog>
-  
+
               <Dialog open={openGoalDialog} onClose={() => setOpenGoalDialog(false)}>
                 <DialogTitle>Set Weekly Goal</DialogTitle>
                 <DialogContent>
@@ -697,7 +773,23 @@ const App = () => {
                   <Button onClick={handleSetWeeklyGoal}>Set Goal</Button>
                 </DialogActions>
               </Dialog>
-  
+
+              <Dialog
+                open={resetConfirmOpen}
+                onClose={() => setResetConfirmOpen(false)}
+              >
+                <DialogTitle>Confirm Reset</DialogTitle>
+                <DialogContent>
+                  <Typography>
+                    Are you sure you want to reset Trackr? This will clear all habit data, your name, and weekly goals. The extension will restart.
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setResetConfirmOpen(false)}>Cancel</Button>
+                  <Button onClick={handleReset} color="error">Reset</Button>
+                </DialogActions>
+              </Dialog>
+
               <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
                 <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
               </Box>
