@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import lottie from 'lottie-web';
 import checkmarkAnimation from '../animations/checkmark_lottie.json';
 import xmarkAnimation from '../animations/xmark_lottie.json';
-import flameAnimation from '../animations/flame_lottie.json';
 
 //#region Animations
 const LottieCheckmark = () => {
@@ -46,25 +45,6 @@ const LottieXmark = () => {
   return <div ref={animationContainer} style={{ width: '40px', height: '40px', display: 'inline-block' }}></div>;
 };
 
-const LottieFlame = () => {
-  const animationContainer = useRef(null);
-
-  useEffect(() => {
-    if (animationContainer.current) {
-      const anim = lottie.loadAnimation({
-        container: animationContainer.current,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: flameAnimation // Ensure this path is correct
-      });
-
-      return () => anim.destroy();
-    }
-  }, []);
-
-  return <div ref={animationContainer} style={{ width: '25px', height: '25px', display: 'inline-block' }}></div>;
-};
 //#endregion
 
 const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
@@ -84,9 +64,6 @@ const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
             <TableRow key={habitIndex}>
               <TableCell component="th" scope="row">
                 {habit.habit}
-                {/* {habit.streak > 0 && (
-                  <LottieFlame/>
-                )} */}
               </TableCell>
               {habit.days.map((value, dayIndex) => (
                 <TableCell

@@ -23,3 +23,4 @@
 - include hideaway feature for submitted scores table
 - weekly progress doesnt immeditaely sinc
 - submitted scores table doesnt immediately sync when delete habit
+- change to 1 point for initial release
