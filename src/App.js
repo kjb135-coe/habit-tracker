@@ -127,7 +127,6 @@ const App = () => {
   const [weeklyGoal, setWeeklyGoal] = useState('');
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
-  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
 
   //#endregion
 
@@ -168,7 +167,6 @@ const App = () => {
           weeklyGoal,
           openGoalDialog,
           tempWeeklyGoal,
-          resetConfirmOpen
         }
       });
     }, 660);
@@ -195,7 +193,6 @@ const App = () => {
     weeklyGoal,
     openGoalDialog,
     tempWeeklyGoal,
-    resetConfirmOpen
   ]);
 
   // Listen for messages from the content script
@@ -233,7 +230,6 @@ const App = () => {
           setWeeklyGoal(payload.weeklyGoal);
           setOpenGoalDialog(payload.openGoalDialog);
           setTempWeeklyGoal(payload.tempWeeklyGoal);
-          setResetConfirmOpen(payload.resetConfirmOpen);
         } else if (payload) {
           // Handle other messages
           setGridData(payload.gridData);
@@ -256,7 +252,6 @@ const App = () => {
           setWeeklyGoal(payload.weeklyGoal);
           setOpenGoalDialog(payload.openGoalDialog);
           setTempWeeklyGoal(payload.tempWeeklyGoal);
-          setResetConfirmOpen(payload.resetConfirmOpen);
         }
       }
     }
@@ -449,34 +444,6 @@ const App = () => {
     }
   };
 
-  const handleReset = () => {
-    // Clear all data
-    setGridData([]);
-    setUserName('');
-    setWeeklyGoal('');
-    setDisplayedScores([
-      [weekDatesTable[0], 0],
-      [weekDatesTable[1], 0],
-      [weekDatesTable[2], 0],
-      [weekDatesTable[3], 0]
-    ]);
-
-    // Clear chrome storage
-    chrome.storage.sync.clear(() => {
-      console.log('Chrome storage cleared');
-    });
-
-    // Show startup popup again
-    setShowStartupPopup(true);
-
-    // Close the menu and reset dialog
-    handleMenuClose();
-    setResetConfirmOpen(false);
-
-    // Show a snackbar message
-    showSnackbar('Trackr has been reset successfully', 'success');
-  };
-
   //#endregion
 
   //#region Helper Functions
@@ -635,12 +602,6 @@ const App = () => {
                     <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
                     <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
                     <MenuItem onClick={() => { handleMenuClose(); setOpenGoalDialog(true); }}>Set Weekly Goal</MenuItem>
-                    <MenuItem
-                      onClick={() => { handleMenuClose(); setResetConfirmOpen(true); }}
-                      sx={{ color: 'red' }}
-                    >
-                      Reset Trackr
-                    </MenuItem>
                   </Menu>
                 </Toolbar>
               </AppBar>
@@ -787,23 +748,6 @@ const App = () => {
                   <Button onClick={handleSetWeeklyGoal}>Set Goal</Button>
                 </DialogActions>
               </Dialog>
-
-              <Dialog
-                open={resetConfirmOpen}
-                onClose={() => setResetConfirmOpen(false)}
-              >
-                <DialogTitle>Confirm Reset</DialogTitle>
-                <DialogContent>
-                  <Typography>
-                    Are you sure you want to reset Trackr? This will clear all habit data, your name, and weekly goals. The extension will restart.
-                  </Typography>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setResetConfirmOpen(false)}>Cancel</Button>
-                  <Button onClick={handleReset} color="error">Reset</Button>
-                </DialogActions>
-              </Dialog>
-
               <Box sx={{ position: 'fixed', left: 20, bottom: 20 }}>
                 <SubmittedScoresTable displayedScores={displayedScores} weekDatesTable={weekDatesTable} />
               </Box>
