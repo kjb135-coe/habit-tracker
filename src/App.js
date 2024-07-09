@@ -609,6 +609,7 @@ const App = () => {
                     color="inherit"
                     onClick={handleMenuOpen}
                     aria-label="menu"
+                    sx={{ position: 'absolute', top: 10, right: 10 }}
                   >
                     <MoreVertIcon />
                   </IconButton>
@@ -616,6 +617,14 @@ const App = () => {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
                   >
                     <MenuItem onClick={() => { handleMenuClose(); setIsAddHabitVisible(true); }}>Add Habit</MenuItem>
                     <MenuItem onClick={() => { handleMenuClose(); setIsDeleteDropdownVisible(true); }}>Delete Habit</MenuItem>
