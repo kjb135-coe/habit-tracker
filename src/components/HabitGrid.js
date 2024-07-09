@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from '@mui/material';
 import lottie from 'lottie-web';
 import checkmarkAnimation from '../animations/checkmark_lottie.json';
 import xmarkAnimation from '../animations/xmark_lottie.json';

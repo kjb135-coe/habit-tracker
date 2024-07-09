@@ -26,7 +26,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
   Divider,
 } from '@mui/material';
 import { Snackbar, Alert } from '@mui/material';

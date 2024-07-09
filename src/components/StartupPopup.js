@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Snackbar, Alert, Box } from '@mui/material';
+import { TextField, Button, Typography, Snackbar, Alert } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
 
