@@ -97,7 +97,7 @@ const App = () => {
   ]);
 
   const [gridData, setGridData] = useState([
-    { habit: '', days: [0, 0, 0, 0, 0, 0, 0], streak: 0 },
+    { habit: '', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -336,17 +336,6 @@ const App = () => {
       [weekDatesTable[2], displayedScores[2][1]],
       [weekDatesTable[3], displayedScores[3][1]],
     ]);
-
-    // Calculate streak
-    let streak = 0;
-    for (let i = dayIndex; i >= 0; i--) {
-      if (newGridData[habitIndex].days[i] > 0) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    newGridData[habitIndex].streak = streak;
 
     setGridData(newGridData);
     updateScoresData();

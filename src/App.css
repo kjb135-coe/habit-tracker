@@ -231,19 +231,6 @@ body {
   color: #000000;
 }
 
-.streak-indicator {
-  display: inline-flex;
-  align-items: center;
-  font-weight: bold;
-  margin-left: 10px;
-}
-
-.streak-number {
-  font-size: 1.2em;
-  margin-right: 5px;
-  color: #ff6600;
-}
-
 .MuiLinearProgress-root {
   background-color: #e0e0e0;
 }
