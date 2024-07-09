@@ -1,10 +1,9 @@
 body {
   margin: 0;
   padding: 0;
-  background-image: url("wp2.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-color: #f0f4f8;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
 }
 
 .App {
@@ -13,131 +12,133 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-family: 'Roboto', sans-serif;
-  color: #ffffff;
   min-height: 100vh;
 }
 
 .App-header {
   padding-top: 50px;
-  /* padding: 30px; */
   padding-bottom: 15px;
-  border-bottom: 0px solid #555;
 }
 
 .App-title {
-  font-size: 36px;
-  font-family: 'Constitution', sans-serif;
+  font-size: 32px;
+  font-family: 'Montserrat', sans-serif;
   margin: 0;
-  color: #ffffff; 
+  color: #2196f3;
 }
-
 
 .GridContainer {
   flex: 3;
-  width: 100%; /* Set width to 75% */
+  width: 100%;
   overflow-x: auto;
 }
 
 .Grid {
-  width: 100%; /* Adjust width */
-  table-layout: fixed;
-}
-
-.Grid td:first-child {
-  text-align: left;
-}
-
-table {
-  border-collapse: collapse;
+  display: grid;
+  font-family: 'Roboto', sans-serif;
   width: 80%;
   margin: 0 auto;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-th, td {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
   border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
+  grid-template-columns: auto repeat(7, 1fr);
 }
 
-th {
+.GridHeader, .GridFooter {
+  display: contents;
   font-weight: bold;
+  font-size: 18px;
+}
+
+.GridRow {
+  display: contents;
+  font-size: 18px;
+}
+
+.GridCell {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  padding: 16px;
+  border: 1px solid #ddd;
+  text-align: center;
   font-size: 16px;
 }
 
-td {
+.GridCell:first-child {
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 500;
   font-size: 18px;
-  border-radius: 5px;
 }
 
-table td:first-child {
-  text-align: left;
+.GridCellSpan {
+  grid-column: span 7;
 }
 
 .green {
-  background-color: #aaffaa;
+  background-color: #66bb6a;
+  color: white;
 }
 
 .red {
-  background-color: #ffaaaa;
+  background-color: #ff7043;
+  color: white;
 }
 
 .middle {
   cursor: pointer;
 }
 
-td.green, td.red, td.middle {
+.GridCell.green, .GridCell.red, .GridCell.middle {
   transition: background-color 0.3s ease;
 }
 
-td.green:hover, td.red:hover, td.middle:hover {
+.GridCell.green:hover, .GridCell.red:hover, .GridCell.middle:hover {
   opacity: 0.8;
 }
 
-.AddHabit {
-  display: flex;
+.AddHabitPopup {
   position: fixed;
-  right: 200px;
-  bottom: 60px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
-.AddHabit input[type="text"],
-.AddHabit select {
-  margin-right: 10px;
-  padding: 5px;
+.AddHabitPopup input[type="text"],
+.AddHabitPopup select,
+.AddHabitPopup button {
+  width: 100%;
+  padding: 12px;
+  margin: 0;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
   font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  opacity: 0.8;
+  border-radius: 6px;
 }
 
-.AddHabit button {
-  padding: 5px 15px;
-  font-size: 16px;
-  background-color: #105be7;
-  color: #fff;
+.AddHabitPopup button {
+  background-color: #2196f3;
+  color: white;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  opacity: 0.8;
+  transition: background-color 0.3s ease;
 }
 
-.AddHabit button:hover {
-  background-color: #0a3da5;
-  opacity: 1.0;
-}
-
-.AddHabit select:hover {
-  opacity: 1.0;
-}
-
-.AddHabit input:hover {
-  opacity: 1.0;
+.AddHabitPopup button:hover {
+  background-color: #1976d2;
 }
 
 .EditButtonContainer {
@@ -163,71 +164,77 @@ td.green:hover, td.red:hover, td.middle:hover {
   position: absolute;
   top: 50px;
   right: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px; /* Increased border radius for a softer look */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Enhanced box shadow for depth */
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  padding: 10px; /* Increased padding for better spacing */
+  padding: 10px;
   z-index: 1000;
-  width: 125px; /* Adjust the width as needed */
+  width: 125px;
 }
 
 .Dropdown button {
   background-color: transparent;
   border: none;
-  padding: 5px; /* Increased padding for better touch/click targets */
+  padding: 12px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease; /* Smooth background color transition */
+  transition: background-color 0.3s ease;
+  border-radius: 6px;
 }
 
 .Dropdown button:hover {
-  background-color: #f2f2f2; /* Hover background color */
-  border-radius: 5px; /* Rounded corners on hover */
+  background-color: #f0f4f8;
 }
 
 .Footer {
   display: flex;
-  flex-direction: column; /* Change to a column layout */
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  height: 100%; /* Ensure the Footer takes up the entire height */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   padding-bottom: 60px;
 }
 
-
 .SubmittedScores {
   position: fixed;
-  left: 200px;
-  bottom: 60px;
+  left: 20px;
+  bottom: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 12px;
 }
 
 .SubmittedScores h2 {
-  font-size: 1.5rem;
+  font-size: 20px;
   margin-bottom: 10px;
+  color: #000000;
+  font-weight: bold;
 }
 
 .SubmittedScores table {
   width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ccc;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .SubmittedScores th, .SubmittedScores td {
-  padding: 8px;
+  padding: 12px;
   text-align: center;
-  border: 1px solid #ccc;
+  border-bottom: 1px solid #ddd;
 }
 
-/* Style for the green checkmark emoji */
-.green-emoji {
-  font-size: 18px; /* Adjust the font size as needed */
-  color: green; /* Change the color to match your design */
+.SubmittedScores th {
+  font-weight: bold;
+  color: #000000;
 }
 
-/* Style for the red x emoji */
-.red-emoji {
-  font-size: 18px; /* Adjust the font size as needed */
-  color: red; /* Change the color to match your design */
+.MuiLinearProgress-root {
+  background-color: #e0e0e0;
+}
+
+.MuiLinearProgress-bar {
+  background-color: #4caf50;
 }
