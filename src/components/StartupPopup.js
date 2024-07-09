@@ -1,7 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Typography, Snackbar, Alert, Box, DialogContent } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
+import { styled } from '@mui/system';
+
+const StyledListItem = styled(Typography)({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '12px',
+  '&:before': {
+    content: '"•"',
+    marginRight: '10px',
+    fontSize: '20px',
+  },
+});
+
+const CellExample = styled(Box)({
+  display: 'inline-block',
+  width: '30px',
+  height: '30px',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+  textAlign: 'center',
+  lineHeight: '30px',
+  marginRight: '10px',
+  cursor: 'pointer',
+});
 
 const StartupPopup = ({ onClose, onNameSubmit }) => {
   const [view, setView] = useState(0);
@@ -103,12 +127,26 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             e.preventDefault();
             setView(3);
           }}>
-            <Typography variant="h5">How to Add Habits</Typography>
-            <ul>
-              <li>Enter the name of the habit.</li>
-              <li>Select the number of points you can earn per day.</li>
-              <li>Click on the cells to track your progress.</li>
-            </ul>
+            <Typography variant="h5" gutterBottom>How to Use Trackr</Typography>
+            <DialogContent>
+              <StyledListItem>Enter the name of your habit.</StyledListItem>
+              <StyledListItem>Select the number of points you can earn per day (1-3).</StyledListItem>
+              <StyledListItem>Click on the cells to track your progress:</StyledListItem>
+              <Box ml={4} mb={2}>
+                <Typography variant="body2">
+                  <CellExample>·</CellExample> Not completed
+                </Typography>
+                <Typography variant="body2">
+                  <CellExample>1</CellExample> <CellExample>2</CellExample> <CellExample>3</CellExample> Points earned
+                </Typography>
+                <Typography variant="body2">
+                  <CellExample>X</CellExample> Completed (max points)
+                </Typography>
+              </Box>
+              <Typography variant="body2" gutterBottom>
+                Clicking cycles through: blank → 1 → 2 → 3 → X → blank
+              </Typography>
+            </DialogContent>
             <Button
               type="submit"
               variant="contained"
@@ -121,7 +159,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
       case 3:
         return (
           <form onSubmit={handleHabitSubmit}>
-            <Typography variant="h5">Add Your First Habit</Typography>
+            <Typography variant="h5" gutterBottom>Add Your First Habit</Typography>
             <TextField
               label="Habit Name"
               variant="outlined"
@@ -156,6 +194,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
         return null;
     }
   };
+
 
   return (
     <motion.div
