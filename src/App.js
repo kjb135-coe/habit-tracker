@@ -426,6 +426,12 @@ const App = () => {
     const updatedGridData = [...gridData];
     updatedGridData.splice(confirmDelete.habitIndex, 1);
     setGridData(updatedGridData);
+    setDisplayedScores([
+      [weekDatesTable[0], calculateScore()],
+      [weekDatesTable[1], displayedScores[1][1]],
+      [weekDatesTable[2], displayedScores[2][1]],
+      [weekDatesTable[3], displayedScores[3][1]],
+    ]);
 
     setIsDeleteDropdownVisible(false);
     setConfirmDelete({ open: false, habitIndex: null });
