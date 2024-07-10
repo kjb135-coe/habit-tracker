@@ -19,7 +19,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  MenuItem,
   Button,
   List,
   ListItem,

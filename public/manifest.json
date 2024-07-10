@@ -24,7 +24,6 @@
   "author": "Keegan Borig",
   "permissions": [
     "tabs",
-    "activeTab",
     "storage",
     "webNavigation"
   ],
