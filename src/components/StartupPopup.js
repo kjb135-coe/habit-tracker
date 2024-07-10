@@ -50,25 +50,6 @@ const LottieXmark = () => {
 
 //#endregion
 
-
-const StyledListItem = styled(Box)({
-  display: 'flex',
-  alignItems: 'flex-start',
-  marginBottom: '16px',
-});
-
-const Bullet = styled(Box)({
-  marginRight: '12px',
-  fontSize: '20px',
-  lineHeight: '24px',
-  flexShrink: 0,
-});
-
-const ListItemContent = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
 const CellExample = styled(Box)({
   display: 'inline-flex',
   width: '40px',
