@@ -15,7 +15,7 @@ const LottieCheckmark = () => {
         renderer: 'svg',
         loop: false,
         autoplay: true,
-        animationData: checkmarkAnimation // Ensure this path is correct
+        animationData: checkmarkAnimation
       });
 
       return () => anim.destroy();
@@ -35,7 +35,7 @@ const LottieXmark = () => {
         renderer: 'svg',
         loop: false,
         autoplay: true,
-        animationData: xmarkAnimation // Ensure this path is correct
+        animationData: xmarkAnimation
       });
 
       return () => anim.destroy();
@@ -72,18 +72,14 @@ const HabitGrid = ({ gridData, weekDates, onCellClick, calculateScore }) => {
                   onClick={() => onCellClick(habitIndex, dayIndex)}
                   sx={{
                     cursor: 'pointer',
-                    backgroundColor: value >= 1 && value <= 3 ? '#aaffaa' : value === -1 ? '#ffaaaa' : 'inherit',
+                    backgroundColor: value === 1 ? '#aaffaa' : value === -1 ? '#ffaaaa' : 'inherit',
                     '&:hover': {
-                      backgroundColor: value >= 1 && value <= 3 ? '#88dd88' : value === -1 ? '#dd8888' : '#e0e0e0',
+                      backgroundColor: value === 1 ? '#88dd88' : value === -1 ? '#dd8888' : '#e0e0e0',
                     }
                   }}
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40px' }}>
-                    {value >= 1 && value <= 3
-                      ? Array.from({ length: value }, (_, i) => <LottieCheckmark key={i} />)
-                      : value === -1
-                        ? <LottieXmark />
-                        : null}
+                    {value === 1 ? <LottieCheckmark /> : value === -1 ? <LottieXmark /> : null}
                   </Box>
                 </TableCell>
               ))}

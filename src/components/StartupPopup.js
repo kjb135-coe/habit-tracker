@@ -31,9 +31,7 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
   const [view, setView] = useState(0);
   const [name, setName] = useState('');
   const [habit, setHabit] = useState('');
-  const [points, setPoints] = useState(1);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'warning' });
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -54,7 +52,6 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
     const newHabit = {
       habit: habit,
       days: new Array(7).fill(0),
-      selectedWCount: points,
     };
     onClose(newHabit);
   };
@@ -130,21 +127,20 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             <Typography variant="h5" gutterBottom>How to Use Trackr</Typography>
             <DialogContent>
               <StyledListItem>Enter the name of your habit.</StyledListItem>
-              <StyledListItem>Select the number of points you can earn per day (1-3).</StyledListItem>
               <StyledListItem>Click on the cells to track your progress:</StyledListItem>
               <Box ml={4} mb={2}>
                 <Typography variant="body2">
                   <CellExample>·</CellExample> Not completed
                 </Typography>
                 <Typography variant="body2">
-                  <CellExample>1</CellExample> <CellExample>2</CellExample> <CellExample>3</CellExample> Points earned
+                  <CellExample>✓</CellExample> Completed
                 </Typography>
                 <Typography variant="body2">
-                  <CellExample>X</CellExample> Completed (max points)
+                  <CellExample>X</CellExample> Missed
                 </Typography>
               </Box>
               <Typography variant="body2" gutterBottom>
-                Clicking cycles through: blank → 1 → 2 → 3 → X → blank
+                Clicking cycles through: blank → completed → missed → blank
               </Typography>
             </DialogContent>
             <Button
@@ -170,20 +166,10 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               inputProps={{ maxLength: 25 }}
               helperText={`${habit.length}/25`}
             />
-            <TextField
-              label="Max Points per Day"
-              variant="outlined"
-              type="number"
-              value={points}
-              onChange={(e) => setPoints(parseInt(e.target.value, 10))}
-              inputProps={{ min: 1, max: 3 }}
-              fullWidth
-              margin="normal"
-            />
             <Button
               type="submit"
               variant="contained"
-              disabled={!habit || points < 1 || points > 3}
+              disabled={!habit}
               fullWidth
             >
               Add Habit
@@ -194,7 +180,6 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
         return null;
     }
   };
-
 
   return (
     <motion.div

@@ -102,7 +102,6 @@ const App = () => {
 
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
-  const [selectedWCount, setSelectedWCount] = useState(1);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
   const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
@@ -150,7 +149,6 @@ const App = () => {
           gridData,
           showAddHabit,
           newHabitName,
-          selectedWCount,
           isDropdownVisible,
           isAddHabitVisible,
           isDeleteDropdownVisible,
@@ -176,7 +174,6 @@ const App = () => {
     gridData,
     showAddHabit,
     newHabitName,
-    selectedWCount,
     isDropdownVisible,
     isAddHabitVisible,
     isDeleteDropdownVisible,
@@ -213,7 +210,6 @@ const App = () => {
           setGridData(payload.gridData);
           setShowAddHabit(payload.showAddHabit);
           setNewHabitName(payload.newHabitName);
-          setSelectedWCount(payload.selectedWCount);
           setIsDropdownVisible(payload.isDropdownVisible);
           setIsAddHabitVisible(payload.isAddHabitVisible);
           setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
@@ -235,7 +231,6 @@ const App = () => {
           setGridData(payload.gridData);
           setShowAddHabit(payload.showAddHabit);
           setNewHabitName(payload.newHabitName);
-          setSelectedWCount(payload.selectedWCount);
           setIsDropdownVisible(payload.isDropdownVisible);
           setIsAddHabitVisible(payload.isAddHabitVisible);
           setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
@@ -309,26 +304,11 @@ const App = () => {
   const handleCellClick = (habitIndex, dayIndex) => {
     const newGridData = [...gridData];
     const currentValue = newGridData[habitIndex].days[dayIndex];
-    const selectedWCount = newGridData[habitIndex].selectedWCount; // Get selectedWCount for the habit
 
-    if (selectedWCount === undefined || selectedWCount === 'Enter Max Points') {
-      // Handle when selectedWCount is not defined or set to 'Enter Max Points'
-      if (selectedWCount === 'Enter Max Points') alert('Please add a habit or select the max number of points for this habit.');
-
-      return;
-    }
-
-    if (currentValue >= 0 && currentValue < selectedWCount) {
-      // Increment the cell value within the selectedWCount limit
-      newGridData[habitIndex].days[dayIndex] = currentValue + 1;
-    }
-    else if (currentValue === selectedWCount) {
-      newGridData[habitIndex].days[dayIndex] = -1; // Set to -1 if it reaches selectedWCount
-    }
-    else {
-      // Reset to blank if it exceeds selectedWCount
-      newGridData[habitIndex].days[dayIndex] = 0;
-    }
+    // Update the cell value: 0 (blank) -> 1 (completed) -> -1 (missed) -> 0 (blank)
+    if (currentValue === 0) newGridData[habitIndex].days[dayIndex] = 1;
+    else if (currentValue === 1) newGridData[habitIndex].days[dayIndex] = -1;
+    else newGridData[habitIndex].days[dayIndex] = 0;
 
     setDisplayedScores([
       [weekDatesTable[0], calculateScore()],
@@ -359,7 +339,6 @@ const App = () => {
     const newHabit = {
       habit: newHabitName,
       days: new Array(7).fill(0),
-      selectedWCount: parseInt(selectedWCount),
     };
 
     // Replace the initial "Click the edit icon!" habit with the new habit
@@ -371,7 +350,6 @@ const App = () => {
 
     setShowAddHabit(false);
     setNewHabitName('');
-    setSelectedWCount(selectedWCount);
     setIsAddHabitVisible(false);
     showSnackbar('Habit added successfully.', 'success');
   };
@@ -431,42 +409,22 @@ const App = () => {
 
   //#region Helper Functions
   const updateScoresData = () => {
-    const newScoresData = [];
+    const newScoresData = gridData.map((habit) => ({
+      habit: habit.habit,
+      scores: habit.days,
+      totalScore: habit.days.filter(value => value === 1).length,
+    }));
 
-    gridData.forEach((habit) => {
-      const habitScore = habit.days.reduce((acc, value) => {
-        if (value >= 1 && value <= 3) {
-          acc += value;
-        }
-        return acc;
-      }, 0);
-
-
-      newScoresData.push({
-        habit: habit.habit,
-        scores: habit.days,
-        totalScore: habitScore,
-      });
-    });
-
-    setScoresData([...newScoresData]);
+    setScoresData(newScoresData);
   };
 
   const calculateScore = () => {
-    let score = 0;
-    gridData.forEach((habit) => {
-      habit.days.forEach((value) => {
-        if (value !== -1) score += value;
-      });
-    });
-    return score;
+    return gridData.reduce((total, habit) => 
+      total + habit.days.filter(value => value === 1).length, 0);
   };
 
   const calculateMaxScore = () => {
-    return gridData.reduce((total, habit) => {
-      const maxPointsPerDay = habit.selectedWCount || 0;
-      return total + (maxPointsPerDay * 7);
-    }, 0);
+    return gridData.length * 7; // Max score is now just the number of habits times 7 days
   };
 
   // Function to clear the grid data for new week
@@ -612,44 +570,35 @@ const App = () => {
                 </Container>
               </Box>
 
+
               <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
-                <DialogTitle>Add New Habit</DialogTitle>
-                <DialogContent>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="habit-name"
-                    label="Habit Name"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={newHabitName}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 25) {
-                        setNewHabitName(e.target.value);
-                      } else {
-                        showSnackbar('Habit name must be 25 characters or less.', 'warning');
-                      }
-                    }}
-                    inputProps={{ maxLength: 25 }}
-                    helperText={`${newHabitName.length}/25`}
-                  />
-                  <Select
-                    value={selectedWCount}
-                    onChange={(e) => setSelectedWCount(e.target.value)}
-                    fullWidth
-                    sx={{ mt: 2 }}
-                  >
-                    <SelectMenuItem value={1}>1 point</SelectMenuItem>
-                    <SelectMenuItem value={2}>2 points</SelectMenuItem>
-                    <SelectMenuItem value={3}>3 points</SelectMenuItem>
-                  </Select>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
-                  <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
-                </DialogActions>
-              </Dialog>
+        <DialogTitle>Add New Habit</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="habit-name"
+            label="Habit Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newHabitName}
+            onChange={(e) => {
+              if (e.target.value.length <= 25) {
+                setNewHabitName(e.target.value);
+              } else {
+                showSnackbar('Habit name must be 25 characters or less.', 'warning');
+              }
+            }}
+            inputProps={{ maxLength: 25 }}
+            helperText={`${newHabitName.length}/25`}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
+          <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
+        </DialogActions>
+      </Dialog>
 
               <Dialog
                 open={isDeleteDropdownVisible}
