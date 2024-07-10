@@ -331,8 +331,8 @@ const App = () => {
       return;
     }
 
-    if (newHabitName.length > 25) {
-      showSnackbar('Habit name must be 25 characters or less', 'warning');
+    if (newHabitName.length > 30) {
+      showSnackbar('Habit name must be 30 characters or less', 'warning');
       return;
     }
 
@@ -584,14 +584,14 @@ const App = () => {
             variant="standard"
             value={newHabitName}
             onChange={(e) => {
-              if (e.target.value.length <= 25) {
+              if (e.target.value.length <= 30) {
                 setNewHabitName(e.target.value);
               } else {
-                showSnackbar('Habit name must be 25 characters or less.', 'warning');
+                showSnackbar('Habit name must be 30 characters or less.', 'warning');
               }
             }}
-            inputProps={{ maxLength: 25 }}
-            helperText={`${newHabitName.length}/25`}
+            inputProps={{ maxLength: 30 }}
+            helperText={`${newHabitName.length}/30`}
           />
         </DialogContent>
         <DialogActions>

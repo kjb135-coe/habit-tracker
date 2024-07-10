@@ -1,30 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TextField, Button, Typography, Snackbar, Alert, Box, DialogContent } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import './StartupPopup.css';
 import { styled } from '@mui/system';
+import lottie from 'lottie-web';
+import checkmarkAnimation from '../animations/checkmark_lottie.json';
+import xmarkAnimation from '../animations/xmark_lottie.json';
 
-const StyledListItem = styled(Typography)({
+//#region Animations
+const LottieCheckmark = () => {
+  const animationContainer = useRef(null);
+
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        animationData: checkmarkAnimation
+      });
+
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return <div ref={animationContainer} style={{ width: '22px', height: '22px', display: 'inline-block' }}></div>;
+};
+
+const LottieXmark = () => {
+  const animationContainer = useRef(null);
+
+  useEffect(() => {
+    if (animationContainer.current) {
+      const anim = lottie.loadAnimation({
+        container: animationContainer.current,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        animationData: xmarkAnimation
+      });
+
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return <div ref={animationContainer} style={{ width: '40px', height: '40px', display: 'inline-block' }}></div>;
+};
+
+//#endregion
+
+
+const StyledListItem = styled(Box)({
   display: 'flex',
-  alignItems: 'center',
-  marginBottom: '12px',
-  '&:before': {
-    content: '"•"',
-    marginRight: '10px',
-    fontSize: '20px',
-  },
+  alignItems: 'flex-start',
+  marginBottom: '16px',
+});
+
+const Bullet = styled(Box)({
+  marginRight: '12px',
+  fontSize: '20px',
+  lineHeight: '24px',
+  flexShrink: 0,
+});
+
+const ListItemContent = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 const CellExample = styled(Box)({
-  display: 'inline-block',
-  width: '30px',
-  height: '30px',
-  border: '1px solid #ccc',
+  display: 'inline-flex',
+  width: '40px',
+  height: '40px',
+  border: '2px solid #ccc',
   borderRadius: '4px',
-  textAlign: 'center',
-  lineHeight: '30px',
-  marginRight: '10px',
-  cursor: 'pointer',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '20px',
+  marginRight: '12px',
+  backgroundColor: '#f5f5f5',
 });
 
 const StartupPopup = ({ onClose, onNameSubmit }) => {
@@ -124,22 +179,29 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
             e.preventDefault();
             setView(3);
           }}>
-            <Typography variant="h5" gutterBottom>How to Use Trackr</Typography>
-            <DialogContent>
-              <StyledListItem>Enter the name of your habit.</StyledListItem>
-              <StyledListItem>Click on the cells to track your progress:</StyledListItem>
-              <Box ml={4} mb={2}>
-                <Typography variant="body2">
-                  <CellExample>·</CellExample> Not completed
-                </Typography>
-                <Typography variant="body2">
-                  <CellExample>✓</CellExample> Completed
-                </Typography>
-                <Typography variant="body2">
-                  <CellExample>X</CellExample> Missed
-                </Typography>
+            <DialogContent sx={{ padding: '24px' }}>
+              <Typography variant="h5" gutterBottom sx={{ marginBottom: '24px' }}>How to Use Trackr</Typography>
+              <Typography gutterBottom sx={{ marginBottom: '12px' }}>Add habits, delete habits, and set weekly goals!</Typography>
+              <Typography gutterBottom sx={{ marginBottom: '12px' }}>Click on the cells to track your progress:</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', marginLeft: '12px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <CellExample></CellExample>
+                  <Typography>Not completed</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <CellExample>
+                    <LottieCheckmark />
+                  </CellExample>
+                  <Typography>Completed</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <CellExample>
+                    <LottieXmark />
+                  </CellExample>
+                  <Typography>Missed</Typography>
+                </Box>
               </Box>
-              <Typography variant="body2" gutterBottom>
+              <Typography variant="body2" sx={{ marginTop: '12px' }}>
                 Clicking cycles through: blank → completed → missed → blank
               </Typography>
             </DialogContent>
@@ -163,8 +225,8 @@ const StartupPopup = ({ onClose, onNameSubmit }) => {
               onChange={handleHabitChange}
               fullWidth
               margin="normal"
-              inputProps={{ maxLength: 25 }}
-              helperText={`${habit.length}/25`}
+              inputProps={{ maxLength: 30 }}
+              helperText={`${habit.length}/30`}
             />
             <Button
               type="submit"
