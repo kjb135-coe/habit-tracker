@@ -6,3 +6,11 @@ NEXT VERSION POSSIBLE ADDITIONS:
 - multiple points per cell
 - view months of data
 - include hideaway feature for submitted scores table
+- able to drag and reorder habits
+- feature for most visited sites
+- reminders
+- edit habit name
+- goals per habit
+- TODO on sign above submitted score table (hideaway)
+- add analytics
+- screentime like popup windows at start of week (last week summary with percentages)

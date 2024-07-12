@@ -3,6 +3,7 @@
   "name": "Trackr",
   "version": "1.0.0",
   "manifest_version": 3,
+  "description": "A clean and simple habit tracking extension for Chrome.",
   "background": {
     "service_worker": "background.js"
   },
