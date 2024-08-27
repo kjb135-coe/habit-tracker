@@ -51,20 +51,22 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 let currentTabId;
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-  // console.log('activated');
   if (currentTabId !== undefined) {
-    // The previously active tab is no longer active, save the state
-
-    // Wait for the tab to fully load before saving the state
-    setTimeout(function() {
-      chrome.storage.sync.get(['state'], function(result) {
-        // Save the state of the previous tab
-        let newState = {...result.state, [currentTabId]: {/* state of the tab */}};
-        chrome.storage.sync.set({state: newState}, function() {
-          // console.log('State saved for tab ' + currentTabId);
-        });
-      });
-    }, 500);
+    // Check if the new tab is actually new
+    chrome.tabs.get(activeInfo.tabId, function(tab) {
+      if (tab.url === "chrome://newtab/") {
+        // This is a new tab, save the state of the previous tab
+        setTimeout(function() {
+          chrome.storage.sync.get(['state'], function(result) {
+            // Save the state of the previous tab
+            let newState = {...result.state, [currentTabId]: {/* state of the tab */}};
+            chrome.storage.sync.set({state: newState}, function() {
+              console.log('State saved for tab ' + currentTabId);
+            });
+          });
+        }, 750);
+      }
+    });
   }
 
   // Update the current tab ID

@@ -1,4 +1,4 @@
-// /* global chrome */
+/* global chrome */
 
 // Tab change listener
 chrome.storage.onChanged.addListener(function(changes, namespace) {

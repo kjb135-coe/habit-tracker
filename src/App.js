@@ -164,7 +164,7 @@ const App = () => {
           tempWeeklyGoal,
         }
       });
-    }, 660);
+    }, 750);
     // Clean up the interval when the component unmounts
     return () => clearInterval(interval);
   }, [
@@ -450,7 +450,6 @@ const App = () => {
 
   // Component to display the submitted scores
   const SubmittedScoresTable = ({ displayedScores, weekDatesTable }) => {
-    console.log("Ive been called");
     return (
       <div className="SubmittedScores">
         <table>
