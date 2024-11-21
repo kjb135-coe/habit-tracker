@@ -1,7 +1,7 @@
 /* global chrome */
 
 import './App.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   CssBaseline,
   ThemeProvider,
@@ -53,208 +53,166 @@ const theme = createTheme({
   },
 });
 
+const getMonday = (date) => {
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(date.setDate(diff));
+};
+
+const calculateWeekDate = (startDate, i) => {
+  const currentDate = new Date(startDate);
+  currentDate.setDate(startDate.getDate() - i * 7);
+  const weekStart = getMonday(currentDate);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  return `${weekStart.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
+};
+
+const getCurrentWeekDates = (startDate) => {
+  const monday = getMonday(startDate);
+  const weekDates = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
+  }
+  return weekDates;
+};
+
 const App = () => {
 
   const [startDate, setStartDate] = useState(new Date());
 
-  // Function to get the Monday of the current week
-  const getMonday = (date) => {
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    return new Date(date.setDate(diff));
-  };
+  const initialWeekDatesTable = useMemo(() => [
+    calculateWeekDate(startDate, 0),
+    calculateWeekDate(startDate, 1),
+    calculateWeekDate(startDate, 2),
+    calculateWeekDate(startDate, 3)
+  ], [startDate]);
 
-  const getCurrentWeekDates = (startDate) => {
-    const monday = getMonday(startDate);
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      weekDates.push(date.toLocaleDateString('en-US', { weekday: 'long', month: 'numeric', day: 'numeric' }));
-    }
-    return weekDates;
-  };
+  const initialDisplayedScores = useMemo(() => [
+    [initialWeekDatesTable[0], 0],
+    [initialWeekDatesTable[1], 0],
+    [initialWeekDatesTable[2], 0],
+    [initialWeekDatesTable[3], 0]
+  ], [initialWeekDatesTable]);
 
-  //#region Variables
-  const calculateWeekDate = (startDate, i) => {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() - i * 7);
-    const weekStart = getMonday(currentDate);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    return `${weekStart.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`;
-  };
+  const [weekDatesTable, setWeekDatesTable] = useState(initialWeekDatesTable);
 
-  const currentDate = new Date(startDate);
-  const [weekDatesTable, setWeekDatesTable] = useState([
-    calculateWeekDate(currentDate, 0),
-    calculateWeekDate(currentDate, 1),
-    calculateWeekDate(currentDate, 2),
-    calculateWeekDate(currentDate, 3)
-  ]);
+  const [displayedScores, setDisplayedScores] = useState(initialDisplayedScores);
 
+  // Initialize all states with proper default values
   const [gridData, setGridData] = useState([
     { habit: '', days: [0, 0, 0, 0, 0, 0, 0] },
   ]);
-
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAddHabitVisible, setIsAddHabitVisible] = useState(false);
-  const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false); // New state for delete dropdown
+  const [isDeleteDropdownVisible, setIsDeleteDropdownVisible] = useState(false);
   const [scoresData, setScoresData] = useState([]);
   const [weekDates, setWeekDates] = useState(getCurrentWeekDates(startDate));
   const [showStartupPopup, setShowStartupPopup] = useState(true);
   const [userName, setUserName] = useState('');
-  const [displayedScores, setDisplayedScores] = useState([
-    [weekDatesTable[0], 0],
-    [weekDatesTable[1], 0],
-    [weekDatesTable[2], 0],
-    [weekDatesTable[3], 0]
-  ]);
   const [prevDay, setPrevDay] = useState(new Date().getDay());
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Initialize snackbar with all required properties
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'info'
   });
-  const [confirmDelete, setConfirmDelete] = useState({ open: false, habitIndex: null });
-  const [weeklyGoal, setWeeklyGoal] = useState('');
+  
+  // Initialize other dialog states
+  const [confirmDelete, setConfirmDelete] = useState({ 
+    open: false, 
+    habitIndex: null 
+  });
+  const [weeklyGoal, setWeeklyGoal] = useState(0);
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
-  const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
+  const [tempWeeklyGoal, setTempWeeklyGoal] = useState(0);
 
-  //#endregion
+  useEffect(() => {
+    const initializeState = async () => {
+      try {
+        const result = await chrome.storage.sync.get(['state']);
+        if (result.state) {
+          setGridData(result.state.gridData || [{ habit: '', days: [0, 0, 0, 0, 0, 0, 0] }]);
+          setShowAddHabit(result.state.showAddHabit || false);
+          setNewHabitName(result.state.newHabitName || '');
+          setIsDropdownVisible(result.state.isDropdownVisible || false);
+          setIsAddHabitVisible(result.state.isAddHabitVisible || false);
+          setIsDeleteDropdownVisible(result.state.isDeleteDropdownVisible || false);
+          setScoresData(result.state.scoresData || []);
+          setWeekDates(result.state.weekDates || getCurrentWeekDates(startDate));
+          setShowStartupPopup(result.state.showStartupPopup !== undefined ? result.state.showStartupPopup : true);
+          setUserName(result.state.userName || '');
+          setWeekDatesTable(result.state.weekDatesTable || initialWeekDatesTable);
+          setDisplayedScores(result.state.displayedScores || initialDisplayedScores);
+          setPrevDay(result.state.prevDay || new Date().getDay());
+          setWeeklyGoal(result.state.weeklyGoal || 0);
+          // Initialize snackbar state from storage if it exists
+          if (result.state.snackbar) {
+            setSnackbar(result.state.snackbar);
+          }
+          // Initialize confirm delete state from storage if it exists
+          if (result.state.confirmDelete) {
+            setConfirmDelete(result.state.confirmDelete);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading state:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  //#region Hooks
+    initializeState();
+  }, [startDate, initialWeekDatesTable, initialDisplayedScores]);
+
+  // Update the state saving effect to include all necessary states
+  useEffect(() => {
+    const saveState = async () => {
+      try {
+        await chrome.storage.sync.set({
+          state: {
+            gridData,
+            showAddHabit,
+            newHabitName,
+            isDropdownVisible,
+            isAddHabitVisible,
+            isDeleteDropdownVisible,
+            scoresData,
+            weekDates,
+            showStartupPopup,
+            userName,
+            weekDatesTable,
+            displayedScores,
+            prevDay,
+            weeklyGoal,
+            snackbar,
+            confirmDelete,
+          }
+        });
+      } catch (error) {
+        console.error('Error saving state:', error);
+      }
+    };
+
+    saveState();
+  }, [gridData, userName, weeklyGoal, displayedScores, snackbar, confirmDelete]);
+
+  // ... rest of your component code ...
+
+
   useEffect(() => {
     chrome.storage.sync.get(['startupPopupShown'], (result) => {
       if (result.startupPopupShown) {
         setShowStartupPopup(false);
       }
     });
-  }, []);
-
-  // Communcation for background/content workers
-  // Triggerred whenever any of the states listed are changed
-  // Chrome only allows 120 requests per minute, so this is a workaround
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Store the state in memory using chrome.storage.sync
-      chrome.storage.sync.set({
-        state: {
-          gridData,
-          showAddHabit,
-          newHabitName,
-          isDropdownVisible,
-          isAddHabitVisible,
-          isDeleteDropdownVisible,
-          scoresData,
-          weekDates,
-          showStartupPopup,
-          userName,
-          weekDatesTable,
-          displayedScores,
-          prevDay,
-          anchorEl,
-          snackbar,
-          confirmDelete,
-          weeklyGoal,
-          openGoalDialog,
-          tempWeeklyGoal,
-        }
-      });
-    }, 750);
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(interval);
-  }, [
-    gridData,
-    showAddHabit,
-    newHabitName,
-    isDropdownVisible,
-    isAddHabitVisible,
-    isDeleteDropdownVisible,
-    scoresData,
-    weekDates,
-    showStartupPopup,
-    userName,
-    weekDatesTable,
-    displayedScores,
-    prevDay,
-    anchorEl,
-    snackbar,
-    confirmDelete,
-    weeklyGoal,
-    openGoalDialog,
-    tempWeeklyGoal,
-  ]);
-
-  // Listen for messages from the content script
-  useEffect(() => {
-    function handleMessage(event) {
-      // Only trust messages from the same frame
-      if (event.source !== window) return;
-
-      const message = event.data;
-
-      // Make sure the message has the correct format
-      if (typeof message === 'object' && message !== null && message.type === 'FROM_CONTENT_SCRIPT') {
-        const payload = message.payload;
-
-        // Check the payload type
-        if (payload && (payload.type === 'NEW_TAB_CREATED' || payload.type === 'PAGE_REFRESH_DETECTED')) {
-          // A new tab was created, update the state
-          setGridData(payload.gridData);
-          setShowAddHabit(payload.showAddHabit);
-          setNewHabitName(payload.newHabitName);
-          setIsDropdownVisible(payload.isDropdownVisible);
-          setIsAddHabitVisible(payload.isAddHabitVisible);
-          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-          setScoresData(payload.scoresData);
-          setWeekDates(payload.weekDates);
-          setShowStartupPopup(payload.showStartupPopup);
-          setUserName(payload.userName);
-          setWeekDatesTable(payload.weekDatesTable);
-          setDisplayedScores(payload.displayedScores);
-          setPrevDay(payload.prevDay);
-          setAnchorEl(payload.anchorEl);
-          setSnackbar(payload.snackbar);
-          setConfirmDelete(payload.confirmDelete);
-          setWeeklyGoal(payload.weeklyGoal);
-          setOpenGoalDialog(payload.openGoalDialog);
-          setTempWeeklyGoal(payload.tempWeeklyGoal);
-        } else if (payload) {
-          // Handle other messages
-          setGridData(payload.gridData);
-          setShowAddHabit(payload.showAddHabit);
-          setNewHabitName(payload.newHabitName);
-          setIsDropdownVisible(payload.isDropdownVisible);
-          setIsAddHabitVisible(payload.isAddHabitVisible);
-          setIsDeleteDropdownVisible(payload.isDeleteDropdownVisible);
-          setScoresData(payload.scoresData);
-          setWeekDates(payload.weekDates);
-          setShowStartupPopup(payload.showStartupPopup);
-          setUserName(payload.userName);
-          setWeekDatesTable(payload.weekDatesTable);
-          setDisplayedScores(payload.displayedScores);
-          setPrevDay(payload.prevDay);
-          setAnchorEl(payload.anchorEl);
-          setSnackbar(payload.snackbar);
-          setConfirmDelete(payload.confirmDelete);
-          setWeeklyGoal(payload.weeklyGoal);
-          setOpenGoalDialog(payload.openGoalDialog);
-          setTempWeeklyGoal(payload.tempWeeklyGoal);
-        }
-      }
-    }
-
-    // Add event listener for messages
-    window.addEventListener('message', handleMessage);
-
-    // Make sure to clean up event listeners when the component unmounts
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
   }, []);
 
   // Check for new week
@@ -416,7 +374,7 @@ const App = () => {
   };
 
   const calculateScore = () => {
-    return gridData.reduce((total, habit) => 
+    return gridData.reduce((total, habit) =>
       total + habit.days.filter(value => value === 1).length, 0);
   };
 
@@ -568,33 +526,33 @@ const App = () => {
 
 
               <Dialog open={isAddHabitVisible} onClose={() => setIsAddHabitVisible(false)}>
-        <DialogTitle>Add New Habit</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="habit-name"
-            label="Habit Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={newHabitName}
-            onChange={(e) => {
-              if (e.target.value.length <= 30) {
-                setNewHabitName(e.target.value);
-              } else {
-                showSnackbar('Habit name must be 30 characters or less.', 'warning');
-              }
-            }}
-            inputProps={{ maxLength: 30 }}
-            helperText={`${newHabitName.length}/30`}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
-          <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
-        </DialogActions>
-      </Dialog>
+                <DialogTitle>Add New Habit</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="habit-name"
+                    label="Habit Name"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                    value={newHabitName}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 30) {
+                        setNewHabitName(e.target.value);
+                      } else {
+                        showSnackbar('Habit name must be 30 characters or less.', 'warning');
+                      }
+                    }}
+                    inputProps={{ maxLength: 30 }}
+                    helperText={`${newHabitName.length}/30`}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setIsAddHabitVisible(false)}>Cancel</Button>
+                  <Button onClick={handleAddNewHabit} disabled={!newHabitName}>Add</Button>
+                </DialogActions>
+              </Dialog>
 
               <Dialog
                 open={isDeleteDropdownVisible}

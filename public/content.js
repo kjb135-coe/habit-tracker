@@ -1,29 +1,33 @@
 /* global chrome */
 
-// Tab change listener
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  // console.log('Reached onChanged listener');
+// Helper function to safely send message to window
+const sendMessageToWindow = (message) => {
+  try {
+    window.postMessage(message, '*');
+  } catch (error) {
+    console.error('Error sending message to window:', error);
+  }
+};
+
+// Storage change listener
+chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'sync' && changes.state) {
-    // Send the new state to the window
-    // console.log('TAB CHANGE LISTENER FIRED')
-    window.postMessage({ type: 'FROM_CONTENT_SCRIPT', payload: changes.state.newValue }, '*');
+    console.log('Storage changed:', changes.state.newValue);
+    sendMessageToWindow({
+      type: 'FROM_CONTENT_SCRIPT',
+      payload: changes.state.newValue
+    });
   }
 });
 
-// New tab listener
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.type === 'NEW_TAB_CREATED') {
-    // Send the state to the window
-    // console.log('NEW TAB LISTENER FIRED')
-    window.postMessage({ type: 'FROM_CONTENT_SCRIPT', payload: message.payload.state }, '*');
-  }
-});
-
-// Page refresh listener
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.type === 'PAGE_REFRESH_DETECTED') {
-    // Send the state to the window
-    // console.log('PAGE REFRESH LISTENER FIRED')
-    window.postMessage({ type: 'FROM_CONTENT_SCRIPT', payload: message.payload.state }, '*');
+// Message listeners with improved error handling
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('Received message:', message);
+  
+  if (message.type === 'NEW_TAB_CREATED' || message.type === 'PAGE_REFRESH_DETECTED') {
+    sendMessageToWindow({
+      type: 'FROM_CONTENT_SCRIPT',
+      payload: message.payload.state
+    });
   }
 });
