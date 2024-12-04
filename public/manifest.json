@@ -1,7 +1,7 @@
 {
   "short_name": "Trackr",
   "name": "Trackr",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "manifest_version": 3,
   "description": "A clean and simple habit tracking extension for Chrome.",
   "background": {

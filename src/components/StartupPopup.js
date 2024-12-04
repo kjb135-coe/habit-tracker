@@ -63,11 +63,10 @@ const CellExample = styled(Box)({
   backgroundColor: '#f5f5f5',
 });
 
-const StartupPopup = ({ onClose, onNameSubmit }) => {
+const StartupPopup = ({ onClose, onNameSubmit, snackbar, setSnackbar }) => {
   const [view, setView] = useState(0);
   const [name, setName] = useState('');
   const [habit, setHabit] = useState('');
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'warning' });
 
   useEffect(() => {
     const timer = setTimeout(() => {

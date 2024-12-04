@@ -117,22 +117,23 @@ const App = () => {
   const [prevDay, setPrevDay] = useState(new Date().getDay());
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Initialize snackbar with all required properties
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'info'
   });
-  
+
   // Initialize other dialog states
-  const [confirmDelete, setConfirmDelete] = useState({ 
-    open: false, 
-    habitIndex: null 
+  const [confirmDelete, setConfirmDelete] = useState({
+    open: false,
+    habitIndex: null
   });
   const [weeklyGoal, setWeeklyGoal] = useState(0);
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(0);
+
 
   useEffect(() => {
     const initializeState = async () => {
@@ -223,7 +224,7 @@ const App = () => {
     // Check if today is Monday and the previous day was Sunday
     if (currentDay === 1 && prevDay === 0) {
       const newDate = new Date(startDate);
-      newDate.setDate(startDate.getDate());
+      newDate.setDate(startDate.getDate() + 7);
 
       const currentWeek = weekDates[0];
       const newScoresData = [{ week: currentWeek, score: 0 }, ...scoresData];
@@ -251,6 +252,26 @@ const App = () => {
     // Update the previous day to current day for the next check
     setPrevDay(currentDay);
   }, [prevDay, startDate, weekDates, scoresData, displayedScores, gridData, weekDatesTable]);
+
+  // Add this effect after other useEffects
+  useEffect(() => {
+    const hasUnnamedHabit = Array.isArray(gridData) && gridData.some(habit =>
+      habit.habit && habit.habit.trim() === ''
+    );
+
+    if (hasUnnamedHabit) {
+      // Clear all data
+      localStorage.clear();
+      // Reset to startup screen
+      setShowStartupPopup(true);
+      // Show apology message using Material-UI Snackbar
+      setSnackbar({
+        open: true,
+        message: "We apologize for a previous bug that affected habit names. This has been fixed. Please restart your Trackr journey.",
+        severity: 'info'
+      });
+    }
+  }, [gridData]);
 
   //#endregion
 
@@ -447,7 +468,13 @@ const App = () => {
       <CssBaseline />
       <AnimatePresence mode="wait">
         {showStartupPopup ? (
-          <StartupPopup key="popup" onClose={handlePopupClose} onNameSubmit={handleNameSubmit} />
+          <StartupPopup
+            key="popup"
+            onClose={handlePopupClose}
+            onNameSubmit={handleNameSubmit}
+            snackbar={snackbar}
+            setSnackbar={setSnackbar}
+          />
         ) : (
           <motion.div
             key="main-content"
@@ -519,7 +546,7 @@ const App = () => {
               <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
                 <Container maxWidth="sm">
                   <Typography variant="body2" color="text.secondary" align="center">
-                    © 2024 Trackr v1.0.0
+                    © 2024 Trackr v1.0.4
                   </Typography>
                 </Container>
               </Box>
@@ -538,14 +565,14 @@ const App = () => {
                     variant="standard"
                     value={newHabitName}
                     onChange={(e) => {
-                      if (e.target.value.length <= 30) {
+                      if (e.target.value.length <= 25) {
                         setNewHabitName(e.target.value);
                       } else {
-                        showSnackbar('Habit name must be 30 characters or less.', 'warning');
+                        showSnackbar('Habit name must be 25 characters or less.', 'warning');
                       }
                     }}
-                    inputProps={{ maxLength: 30 }}
-                    helperText={`${newHabitName.length}/30`}
+                    inputProps={{ maxLength: 25 }}
+                    helperText={`${newHabitName.length}/25`}
                   />
                 </DialogContent>
                 <DialogActions>
