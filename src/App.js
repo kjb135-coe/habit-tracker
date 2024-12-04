@@ -546,7 +546,7 @@ const App = () => {
               <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
                 <Container maxWidth="sm">
                   <Typography variant="body2" color="text.secondary" align="center">
-                    © 2024 Trackr v1.0.4
+                    © 2024 Trackr v1.0.5
                   </Typography>
                 </Container>
               </Box>
