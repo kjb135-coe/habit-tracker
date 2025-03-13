@@ -1,7 +1,7 @@
 /* global chrome */
 
 import './App.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   CssBaseline,
   ThemeProvider,
@@ -52,6 +52,19 @@ const theme = createTheme({
     }
   },
 });
+
+// Add this utility function at the top of the file, outside the component
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 const App = () => {
 
@@ -123,6 +136,20 @@ const App = () => {
   const [weeklyGoal, setWeeklyGoal] = useState('');
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const [tempWeeklyGoal, setTempWeeklyGoal] = useState(weeklyGoal);
+  const [isTabActive, setIsTabActive] = useState(true);
+
+  // Add state to track the last saved state
+  const [lastSavedState, setLastSavedState] = useState(null);
+
+  // Create a memoized debounced save function
+  const debouncedSave = useMemo(
+    () =>
+      debounce((newState) => {
+        chrome.storage.sync.set({ state: newState });
+        setLastSavedState(newState);
+      }, 750),
+    []
+  );
 
   //#endregion
 
@@ -135,39 +162,52 @@ const App = () => {
     });
   }, []);
 
-  // Communcation for background/content workers
-  // Triggerred whenever any of the states listed are changed
-  // Chrome only allows 120 requests per minute, so this is a workaround
+  // Add visibility change handler
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Store the state in memory using chrome.storage.sync
-      chrome.storage.sync.set({
-        state: {
-          gridData,
-          showAddHabit,
-          newHabitName,
-          isDropdownVisible,
-          isAddHabitVisible,
-          isDeleteDropdownVisible,
-          scoresData,
-          weekDates,
-          showStartupPopup,
-          userName,
-          weekDatesTable,
-          displayedScores,
-          prevDay,
-          anchorEl,
-          snackbar,
-          confirmDelete,
-          weeklyGoal,
-          openGoalDialog,
-          tempWeeklyGoal,
-        }
-      });
-    }, 750);
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(interval);
+    const handleVisibilityChange = () => {
+      setIsTabActive(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Replace the interval-based state saving with debounced state saving
+  useEffect(() => {
+    if (!isTabActive) return;
+
+    const currentState = {
+      gridData,
+      showAddHabit,
+      newHabitName,
+      isDropdownVisible,
+      isAddHabitVisible,
+      isDeleteDropdownVisible,
+      scoresData,
+      weekDates,
+      showStartupPopup,
+      userName,
+      weekDatesTable,
+      displayedScores,
+      prevDay,
+      anchorEl,
+      snackbar,
+      confirmDelete,
+      weeklyGoal,
+      openGoalDialog,
+      tempWeeklyGoal,
+    };
+
+    // Only save if the state has actually changed
+    if (JSON.stringify(currentState) !== JSON.stringify(lastSavedState)) {
+      debouncedSave(currentState);
+    }
   }, [
+    isTabActive,
+    debouncedSave,
+    lastSavedState,
     gridData,
     showAddHabit,
     newHabitName,
@@ -561,7 +601,7 @@ const App = () => {
               <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto' }}>
                 <Container maxWidth="sm">
                   <Typography variant="body2" color="text.secondary" align="center">
-                    © 2024 Trackr v1.0.0
+                    © 2024 Trackr v1.0.7
                   </Typography>
                 </Container>
               </Box>
