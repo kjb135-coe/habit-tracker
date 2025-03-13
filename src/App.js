@@ -174,7 +174,7 @@ const App = () => {
     };
   }, []);
 
-  // Replace the interval-based state saving with debounced state saving
+  // Modify the state saving useEffect to exclude anchorEl from serialization
   useEffect(() => {
     if (!isTabActive) return;
 
@@ -192,7 +192,7 @@ const App = () => {
       weekDatesTable,
       displayedScores,
       prevDay,
-      anchorEl,
+      // Remove anchorEl from state saving since it's a DOM element
       snackbar,
       confirmDelete,
       weeklyGoal,
@@ -221,7 +221,7 @@ const App = () => {
     weekDatesTable,
     displayedScores,
     prevDay,
-    anchorEl,
+    // Remove anchorEl from dependencies
     snackbar,
     confirmDelete,
     weeklyGoal,
